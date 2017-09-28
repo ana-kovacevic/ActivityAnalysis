@@ -63,7 +63,7 @@ kmeansoutput
 
 kmeansoutput.labels_
 
-
+sadas
 colormap = np.array(['red', 'lime','black'])
 plt.figure(figsize=(14, 7))
 # Plot the Models Classifications
