@@ -81,3 +81,5 @@ plt.figure(figsize=(14, 7))
 colormap = np.array(['red', 'lime','black'])
 plt.scatter(X.step, oneexample.measure_value, c=colormap[gmoutput], s=40)
 plt.title('GMM Clusters')
+
+### Test
