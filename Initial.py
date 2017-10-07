@@ -31,7 +31,7 @@ oneexample.head(n= 10)
 Y = oneexample[['Normalised']]
 X = oneexample[['step']]
 
-from sklearn.cluster import KMeans
+
 kmeans = KMeans(n_clusters=3)
 kmeansoutput = kmeans.fit(Y)
 kmeansoutput
