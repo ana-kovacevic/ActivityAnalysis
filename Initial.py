@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.mixture import GaussianMixture
 
-data = pd.read_csv('C:\\Users\\Ana Kovacevic\\Documents\\DataForActivityAnalysis\\activities_out.csv')
+data = pd.read_csv('D:\\Posao\\Projekti\\City4Age\\activities_out.csv')
 list(data) # check attribute names
 
 #### Normalization
@@ -63,7 +63,16 @@ kmeansoutput
 
 kmeansoutput.labels_
 
-sadas
+import numpy as np
+data
+from hmmlearn import hmm
+Y=data[['step', 'Normalised']]
+model2 = hmm.GaussianHMM(3, "full", )
+model2.fit(Y)
+
+model2
+
+type(Y.transpose())
 colormap = np.array(['red', 'lime','black'])
 plt.figure(figsize=(14, 7))
 # Plot the Models Classifications
@@ -83,3 +92,14 @@ plt.scatter(X.step, oneexample.measure_value, c=colormap[gmoutput], s=40)
 plt.title('GMM Clusters')
 
 ### Test again without pull req
+
+np.random.seed(42)
+
+model = hmm.GaussianHMM(n_components=3, covariance_type="full")
+model.startprob_ = np.array([0.6, 0.3, 0.1])
+model.transmat_ = np.array([[0.7, 0.2, 0.1],
+                             [0.3, 0.5, 0.2],
+                             [0.3, 0.3, 0.4]])
+model.means_ = np.array([[0.0, 0.0], [3.0, -3.0], [5.0, 10.0]])
+model.covars_ = np.tile(np.identity(2), (3, 1, 1))
+X, Z = model.sample(100)
