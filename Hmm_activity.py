@@ -7,7 +7,7 @@ import seaborn as sns
 
 data = pd.read_csv('D:\\Posao\\Projekti\\activities_out.csv')
 
-oneexample = data[data['user_in_role_id'] ==  66] # get one user
+oneexample = data[data['user_in_role_id'] ==  68] # get one user
 oneexample = oneexample[oneexample['detection_variable_name'] =='walk_distance'] # select one activity
 
 oneexample
@@ -137,7 +137,7 @@ for i, (ax, colour) in enumerate(zip(axs, colours)):
 
 plt.show()
 ############################### Color time series by States
-tsX = pd.DataFrame(Y['Normalised'])
+tsX = pd.DataFrame(X['measure_value'])
 tsX['Date'] = dates
 selX = tsX.ix[:].dropna()
 
