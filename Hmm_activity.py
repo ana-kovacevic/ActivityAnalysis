@@ -153,12 +153,11 @@ print(stateX.head())
 a = stateX['state']
 x = stateX.index
 y = stateX['measure_value']
-for a, x1, x2, y1, y2 in zip(a[1:], x[:-1], x[1:], y[:-1], y[1:]):
+for a, x1, x2, y1, y2 in zip(a, x, x[1:], y, y[1:]):
     if a == 0:
-        plt.plot([x1, x2], [y1, y2], 'r')
+        plt.plot([x1, x2], [y1, y2], 'green')
     elif a == 1:
-        plt.plot([x1, x2], [y1, y2], 'g')
+        plt.plot([x1, x2], [y1, y2], 'red')
     else:
-        plt.plot([x1, x2], [y1, y2], 'b')
-
+        plt.plot([x1, x2], [y1, y2], 'purple')
 plt.show()
