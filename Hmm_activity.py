@@ -115,7 +115,7 @@ fig.subplots_adjust(top=0.9, left=0.1, right=0.9, bottom=0.12)
 axs.flatten()[-1].legend(loc='lower center', bbox_to_anchor=(0.5, -0.5), ncol=2)
 plt.show()
 
-
+#adsa
 
 
 #### Create single user single activity cluster
