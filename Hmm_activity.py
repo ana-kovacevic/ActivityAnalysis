@@ -61,24 +61,32 @@ def select_pivot_users_activities(data, user, activities):
 activities=['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time']
 user=66
 pivoted_data=select_pivot_users_activities(data, user, activities)
+
+pivoted_data = pivoted_data.reset_index()
+pivoted_data['interval_end']=pd.to_datetime(pivoted_data['interval_end'])
+
+pivoted_data
+#pivoted_data = pivoted_data['interval_end'].dt.date
+
+pivoted_data = pivoted_data.sort(['user_in_role_id','interval_end'])
 pivoted_data.head()
-pivoted_data[activities]
-model = GaussianHMM(n_components=3, covariance_type="full", n_iter=1000).fit(pivoted_data[activities])
-hidden_states=model.predict(pivoted_data)
+pivoted_data[['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time']]
+
+#pivoted_data=pivoted_data.iloc[:,2:]
+
+model = GaussianHMM(n_components=3, covariance_type="full", n_iter=1000).fit(pivoted_data.iloc[:,2:])
+hidden_states=model.predict(pivoted_data.iloc[:,2:])
 
 
 Y=pivoted_data['sleep_awake_time']
-Y=Y.reset_index()
-Y=Y[['sleep_awake_time']]
+#Y=Y.reset_index()
+#Y=Y[['sleep_awake_time']]
 Z=pivoted_data['sleep_deep_time']
-Z=Z.reset_index()
-Z=Z[['sleep_deep_time']]
+#Z=Z.reset_index()
+#Z=Z[['sleep_deep_time']]
 
-dates=pivoted_data.index.get_level_values(1)
-dates=pd.Series(dates)
 
-dates=pd.to_datetime(dates)
-#format='%d/%m/%Y')
+dates=pivoted_data['interval_end']
 
 
 
@@ -91,16 +99,20 @@ for ax in axs:
     # Use fancy indexing to plot data in each state.
     mask = hidden_states == i
     i=i+1
-    ax.plot_date(dates[mask], Y[mask], ".-", c=colours[0])
-    ax.plot_date(dates[mask], Z[mask], ".-", c=colours[1])
+    line1 = ax.plot_date(dates[mask], Y[mask], ".-", c=colours[0], label ='ana')
+    line2 = ax.plot_date(dates[mask], Z[mask], ".-", c=colours[1], label = 'cenge')
     ax.set_title("{0}th hidden state".format(i))
     # Format the ticks.
     #ax.xaxis.set_major_locator(YearLocator())
     ax.xaxis.set_minor_locator(MonthLocator())
     ax.xaxis.set_minor_locator(DayLocator())
-    #ax.grid(True)
+
+
+    ax.grid(True)
     #plt.suptitle("User_in_role_id: " + str(results[0]) + "     Activity: "+str(results[1]))
     #plt.savefig(path_store + 'user_' + str(results[0])+ '_activity_'+str(results[1])+'.png', bbox_inches='tight')
+fig.subplots_adjust(top=0.9, left=0.1, right=0.9, bottom=0.12)
+axs.flatten()[-1].legend(loc='lower center', bbox_to_anchor=(0.5, -0.5), ncol=2)
 plt.show()
 
 
@@ -228,6 +240,7 @@ for i in range(model.n_components):
     print()
 
 dates=oneexample['interval_end']
+dates = pd.to_datetime(dates)
 
 #### Subplot of states
 fig, axs = plt.subplots(model.n_components, sharex=True, sharey=True)
