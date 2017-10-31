@@ -7,13 +7,6 @@ import datetime as dt
 
 data = pd.read_csv('activities_out.csv')
 
-
-
-
-
-
-
-
 def get_users_activities(data, user):
     user_data=data[data['user_in_role_id']==user]
     d = user_data.groupby(['user_in_role_id', 'detection_variable_name'])['measure_value'].count()
@@ -25,7 +18,7 @@ def get_users_activities(data, user):
 def select_pivot_users_activities(data, user, activities):
     user_data=data[data['user_in_role_id']==user]
     user_data=user_data[user_data['detection_variable_name'].isin(activities)]
-    pivot_data = user_data.pivot_table(index=['user_in_role_id', 'interval_end'], columns='detection_variable_name',values='measure_value')
+    pivot_data = user_data.pivot_table(index=['user_in_role_id', 'interval_end'], columns='detection_variable_name',values='Normalised')
     return pivot_data
 
 
@@ -38,35 +31,56 @@ pivoted_data=select_pivot_users_activities(data, user, activities)
 pivoted_data = pivoted_data.reset_index()
 pivoted_data['interval_end']=pd.to_datetime(pivoted_data['interval_end'])
 
-pivoted_data
+#pivoted_data
 #pivoted_data = pivoted_data['interval_end'].dt.date
 
-pivoted_data = pivoted_data.sort(['user_in_role_id','interval_end'])
-pivoted_data.head()
-pivoted_data[['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time']]
+pivoted_data = pivoted_data.sort_values(['user_in_role_id','interval_end'])
+#pivoted_data.head()
+#pivoted_data[['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time']]
 
 #pivoted_data=pivoted_data.iloc[:,2:]
 
-model = GaussianHMM(n_components=3, covariance_type="full", n_iter=1000).fit(pivoted_data.iloc[:,2:])
+model = GaussianHMM(n_components=3, covariance_type="diag", n_iter=1000).fit(pivoted_data.iloc[:,2:])
 hidden_states=model.predict(pivoted_data.iloc[:,2:])
 
 
 Y=pivoted_data['sleep_awake_time']
-#Y=Y.reset_index()
-#Y=Y[['sleep_awake_time']]
 Z=pivoted_data['sleep_deep_time']
-#Z=Z.reset_index()
-#Z=Z[['sleep_deep_time']]
-
-
-dates=pivoted_data['interval_end']
-
+W=pivoted_data['sleep_light_time']
+X=pivoted_data['sleep_tosleep_time']
+dates=(pivoted_data['interval_end']).dt.to_pydatetime()
 
 
 
-### Subplot the states multi-variate single user
+
+
+
+
+
+
+
+
+'''
+tsY = pd.DataFrame(Y['Normalised'])
+tsY['Date'] = dates
+selY = tsY.ix[:].dropna()
+
+selY['Date'] = pd.to_datetime(selY['Date'])
+selY.set_index('Date', inplace=True)
+stateY = (pd.DataFrame(hidden_states, columns=['state'], index=selY.index)
+          .join(selY, how='inner')
+          .assign(vol_cret=selY.Normalised.cumsum())
+          .reset_index(drop=False)
+          .rename(columns={'index':'Date'}))
+print(stateY.head())
+'''
+
+
+
+### Subplot the states multi-variate single user - By States
 fig, axs = plt.subplots(model.n_components, sharex=True, sharey=True)
-colours = cm.rainbow(np.linspace(0, 1, model.n_components))
+#colours = cm.rainbow(np.linspace(0, 1, model.n_components))
+colours = cm.rainbow(np.linspace(0, 1, 4))
 i=0
 for ax in axs:
     # Use fancy indexing to plot data in each state.
@@ -74,6 +88,8 @@ for ax in axs:
     i=i+1
     line1 = ax.plot_date(dates[mask], Y[mask], ".-", c=colours[0], label ='sleep_awake_time')
     line2 = ax.plot_date(dates[mask], Z[mask], ".-", c=colours[1], label = 'sleep_deep_time')
+    line3 = ax.plot_date(dates[mask], W[mask], ".-", c=colours[2], label='sleep_light_time')
+    line4 = ax.plot_date(dates[mask], X[mask], ".-", c=colours[3], label='sleep_tosleep_time')
     ax.set_title("{0}th hidden state".format(i))
     # Format the ticks.
     #ax.xaxis.set_major_locator(YearLocator())
@@ -88,6 +104,34 @@ fig.subplots_adjust(top=0.9, left=0.1, right=0.9, bottom=0.12)
 axs.flatten()[-1].legend(loc='lower center', bbox_to_anchor=(0.5, -0.5), ncol=2)
 plt.show()
 
+
+
+############## Check but hard to work for multivariate
+############################### Color multivariate time series by States
+
+a = hidden_states
+x = dates
+y = Y
+for a, x1, x2, y1, y2 in zip(a[1:], x[:-1], x[1:], y[:-1], y[1:]):
+    if a == 0:
+        plt.plot([x1, x2], [y1, y2], 'r')
+    elif a == 1:
+        plt.plot([x1, x2], [y1, y2], 'g')
+    else:
+        plt.plot([x1, x2], [y1, y2], 'b')
+
+a = hidden_states
+x = dates
+y = Z
+for a, x1, x2, y1, y2 in zip(a[1:], x[:-1], x[1:], y[:-1], y[1:]):
+    if a == 0:
+        plt.plot([x1, x2], [y1, y2], 'r')
+    elif a == 1:
+        plt.plot([x1, x2], [y1, y2], 'g')
+    else:
+        plt.plot([x1, x2], [y1, y2], 'b')
+
+plt.show()
 
 
 
