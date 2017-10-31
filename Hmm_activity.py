@@ -40,14 +40,15 @@ pivoted_data = pivoted_data.sort_values(['user_in_role_id','interval_end'])
 
 #pivoted_data=pivoted_data.iloc[:,2:]
 
-model = GaussianHMM(n_components=3, covariance_type="diag", n_iter=1000).fit(pivoted_data.iloc[:,2:])
+model = GaussianHMM(n_components=2, covariance_type="diag", n_iter=1000).fit(pivoted_data.iloc[:,2:])
 hidden_states=model.predict(pivoted_data.iloc[:,2:])
 
-
+'''
 Y=pivoted_data['sleep_awake_time']
 Z=pivoted_data['sleep_deep_time']
 W=pivoted_data['sleep_light_time']
 X=pivoted_data['sleep_tosleep_time']
+'''
 dates=(pivoted_data['interval_end']).dt.to_pydatetime()
 
 
@@ -79,16 +80,16 @@ print_hmm_params(model)
 ### Subplot the states multi-variate single user - By States
 fig, axs = plt.subplots(model.n_components, sharex=True, sharey=True)
 #colours = cm.rainbow(np.linspace(0, 1, model.n_components))
-colours = cm.rainbow(np.linspace(0, 1, 4))
+colours = cm.rainbow(np.linspace(0, 1, len(activities)))
 i=0
+lines=[]
 for ax in axs:
     # Use fancy indexing to plot data in each state.
     mask = hidden_states == i
     i=i+1
-    line1 = ax.plot_date(dates[mask], Y[mask], ".-", c=colours[0], label ='sleep_awake_time')
-    line2 = ax.plot_date(dates[mask], Z[mask], ".-", c=colours[1], label = 'sleep_deep_time')
-    line3 = ax.plot_date(dates[mask], W[mask], ".-", c=colours[2], label='sleep_light_time')
-    line4 = ax.plot_date(dates[mask], X[mask], ".-", c=colours[3], label='sleep_tosleep_time')
+    for j in range(len(activities)):
+        Y = pivoted_data[activities[j]]
+        lines.append( ax.plot_date(dates[mask], Y[mask], ".-", c=colours[j], label =activities[j]))
     ax.set_title("{0}th hidden state".format(i))
     # Format the ticks.
     #ax.xaxis.set_major_locator(YearLocator())
