@@ -25,6 +25,8 @@ def select_pivot_users_activities(data, user, activities):
 #### Create single user single multiple activities cluster
 
 activities=['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time']
+
+activities=['sleep_tosleep_time']
 user=66
 pivoted_data=select_pivot_users_activities(data, user, activities)
 
@@ -40,7 +42,7 @@ pivoted_data = pivoted_data.sort_values(['user_in_role_id','interval_end'])
 
 #pivoted_data=pivoted_data.iloc[:,2:]
 
-model = GaussianHMM(n_components=2, covariance_type="diag", n_iter=1000).fit(pivoted_data.iloc[:,2:])
+model = GaussianHMM(n_components=4, covariance_type="diag", n_iter=1000).fit(pivoted_data.iloc[:,2:])
 hidden_states=model.predict(pivoted_data.iloc[:,2:])
 
 '''
@@ -104,7 +106,9 @@ fig.subplots_adjust(top=0.9, left=0.1, right=0.9, bottom=0.12)
 axs.flatten()[-1].legend(loc='lower center', bbox_to_anchor=(0.5, -0.5), ncol=2)
 plt.show()
 
+##### PCA ###
 
+from sklearn import
 
 ############## Check but hard to work for multivariate
 ############################### Color multivariate time series by States
