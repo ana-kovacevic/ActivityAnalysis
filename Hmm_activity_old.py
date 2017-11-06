@@ -25,8 +25,6 @@ def select_pivot_users_activities(data, user, activities):
 #### Create single user single multiple activities cluster
 
 activities=['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time']
-
-activities=['sleep_tosleep_time']
 user=66
 pivoted_data=select_pivot_users_activities(data, user, activities)
 
@@ -42,56 +40,56 @@ pivoted_data = pivoted_data.sort_values(['user_in_role_id','interval_end'])
 
 #pivoted_data=pivoted_data.iloc[:,2:]
 
-model = GaussianHMM(n_components=4, covariance_type="diag", n_iter=1000).fit(pivoted_data.iloc[:,2:])
+model = GaussianHMM(n_components=3, covariance_type="diag", n_iter=1000).fit(pivoted_data.iloc[:,2:])
 hidden_states=model.predict(pivoted_data.iloc[:,2:])
 
-'''
+
 Y=pivoted_data['sleep_awake_time']
 Z=pivoted_data['sleep_deep_time']
 W=pivoted_data['sleep_light_time']
 X=pivoted_data['sleep_tosleep_time']
-'''
 dates=(pivoted_data['interval_end']).dt.to_pydatetime()
 
 
 
 
 
-#### Print model parameters
-#maybe add whaole covariances
-def print_hmm_params(model):
-    print("Transition matrix")
-    print(model.transmat_)
-    print()
-
-    print("Means and vars of each hidden state")
-    for i in range(model.n_components):
-        print("{0}th hidden state".format(i))
-        print("mean = ", model.means_[i])
-        print("var = ", np.diag(model.covars_[i]))
-        print()
 
 
 
 
-print_hmm_params(model)
 
-##### Plot model results (means and variances)
+
+'''
+tsY = pd.DataFrame(Y['Normalised'])
+tsY['Date'] = dates
+selY = tsY.ix[:].dropna()
+
+selY['Date'] = pd.to_datetime(selY['Date'])
+selY.set_index('Date', inplace=True)
+stateY = (pd.DataFrame(hidden_states, columns=['state'], index=selY.index)
+          .join(selY, how='inner')
+          .assign(vol_cret=selY.Normalised.cumsum())
+          .reset_index(drop=False)
+          .rename(columns={'index':'Date'}))
+print(stateY.head())
+'''
+
 
 
 ### Subplot the states multi-variate single user - By States
 fig, axs = plt.subplots(model.n_components, sharex=True, sharey=True)
 #colours = cm.rainbow(np.linspace(0, 1, model.n_components))
-colours = cm.rainbow(np.linspace(0, 1, len(activities)))
+colours = cm.rainbow(np.linspace(0, 1, 4))
 i=0
-lines=[]
 for ax in axs:
     # Use fancy indexing to plot data in each state.
     mask = hidden_states == i
     i=i+1
-    for j in range(len(activities)):
-        Y = pivoted_data[activities[j]]
-        lines.append( ax.plot_date(dates[mask], Y[mask], ".-", c=colours[j], label =activities[j]))
+    line1 = ax.plot_date(dates[mask], Y[mask], ".-", c=colours[0], label ='sleep_awake_time')
+    line2 = ax.plot_date(dates[mask], Z[mask], ".-", c=colours[1], label = 'sleep_deep_time')
+    line3 = ax.plot_date(dates[mask], W[mask], ".-", c=colours[2], label='sleep_light_time')
+    line4 = ax.plot_date(dates[mask], X[mask], ".-", c=colours[3], label='sleep_tosleep_time')
     ax.set_title("{0}th hidden state".format(i))
     # Format the ticks.
     #ax.xaxis.set_major_locator(YearLocator())
@@ -106,9 +104,7 @@ fig.subplots_adjust(top=0.9, left=0.1, right=0.9, bottom=0.12)
 axs.flatten()[-1].legend(loc='lower center', bbox_to_anchor=(0.5, -0.5), ncol=2)
 plt.show()
 
-##### PCA ###
 
-from sklearn import
 
 ############## Check but hard to work for multivariate
 ############################### Color multivariate time series by States
@@ -308,8 +304,96 @@ for a, x1, x2, y1, y2 in zip(a[1:], x[:-1], x[1:], y[:-1], y[1:]):
 plt.show()
 
 
+#################### Train on  value (X)
+model = GaussianHMM(n_components=3, covariance_type="diag", n_iter=1000).fit(X)
 
+# Predict the optimal sequence of internal hidden state
+hidden_states = model.predict(X)
 
+print("done")
 
+print("Transition matrix")
+print(model.transmat_)
+print()
 
+#### Print model parameters
+
+print("Transition matrix")
+print(model.transmat_)
+print()
+
+print("Means and vars of each hidden state")
+for i in range(model.n_components):
+    print("{0}th hidden state".format(i))
+    print("mean = ", model.means_[i])
+    print("var = ", np.diag(model.covars_[i]))
+    print()
+
+dates=oneexample['interval_end']
+
+#### Subplot of states
+fig, axs = plt.subplots(model.n_components, sharex=True, sharey=True)
+colours = cm.rainbow(np.linspace(0, 1, model.n_components))
+for i, (ax, colour) in enumerate(zip(axs, colours)):
+    # Use fancy indexing to plot data in each state.
+    mask = hidden_states == i
+    ax.plot_date(dates[mask], X[mask], ".-", c=colour)
+    ax.set_title("{0}th hidden state".format(i))
+
+    # Format the ticks.
+    #ax.xaxis.set_major_locator(YearLocator())
+    ax.xaxis.set_minor_locator(MonthLocator())
+    ax.xaxis.set_minor_locator(DayLocator())
+
+    ax.grid(True)
+
+plt.show()
+############################### Color time series by States
+tsX = pd.DataFrame(X['measure_value'])
+tsX['Date'] = dates
+selX = tsX.ix[:].dropna()
+
+selX['Date'] = pd.to_datetime(selX['Date'])
+selX.set_index('Date', inplace=True)
+stateX = (pd.DataFrame(hidden_states, columns=['state'], index=selX.index)
+          .join(selX, how='inner')
+          .assign(vol_cret=selX.measure_value.cumsum())
+          .reset_index(drop=False)
+          .rename(columns={'index':'Date'}))
+print(stateX.head())
+
+a = stateX['state']
+x = stateX.index
+y = stateX['measure_value']
+for a, x1, x2, y1, y2 in zip(a, x, x[1:], y, y[1:]):
+    if a == 0:
+        plt.plot([x1, x2], [y1, y2], 'green')
+    elif a == 1:
+        plt.plot([x1, x2], [y1, y2], 'red')
+    else:
+        plt.plot([x1, x2], [y1, y2], 'purple')
+plt.show()
 '''
+
+#users=data['user_in_role_id'].unique()
+#activities=data['detection_variable_name'].unique()
+#pd.unique(data[['user_in_role_id', 'interval_end']].values)
+#data.shape[0]
+#user_data=data[data['user_in_role_id']==66]
+#activities=user_data['detection_variable_name'].unique()
+#dates=user_data[user_data['detection_variable_name']=='walk_steps']
+
+
+##### Select users and activities
+
+#users=[66]
+
+#data[data['user_in_role_id'].isin(users)]
+
+#activities_for_multi=['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time']
+
+
+
+#get_users_activities(data, 66)
+
+#user=66
