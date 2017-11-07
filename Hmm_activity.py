@@ -7,6 +7,8 @@ import datetime as dt
 
 data = pd.read_csv('activities_out.csv')
 
+get_users_activities(data,66)
+
 def get_users_activities(data, user):
     user_data=data[data['user_in_role_id']==user]
     d = user_data.groupby(['user_in_role_id', 'detection_variable_name'])['measure_value'].count()
@@ -24,7 +26,9 @@ def select_pivot_users_activities(data, user, activities):
 
 #### Create single user single multiple activities cluster
 
-activities=['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time']
+activities=['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time', 'sleep_wakeup_num']
+[ 0.16932597,  0.23696033,  0.2439348 ,  0.11758979,  0.20387557]])
+
 
 #activities=['sleep_tosleep_time']
 user=66
@@ -66,51 +70,60 @@ print_hmm_params(model)
 
 ##### Plot model results (means and variances)
 
+def plot_states(model, pivoted_data, activities, hidden_states):
+    ### Subplot the states multi-variate single user - By States
+    fig, axs = plt.subplots(model.n_components, sharex=True, sharey=True)
+    #colours = cm.rainbow(np.linspace(0, 1, model.n_components))
+    colours = cm.rainbow(np.linspace(0, 1, len(activities)))
+    i=0
+    lines=[]
+    for ax in axs:
+        # Use fancy indexing to plot data in each state.
+        mask = hidden_states == i
+        i=i+1
+        for j in range(len(activities)):
+            Y = pivoted_data[activities[j]]
+            lines.append( ax.plot_date(dates[mask], Y[mask], ".-", c=colours[j], label =activities[j]))
+        ax.set_title("{0}th hidden state".format(i))
+        # Format the ticks.
+        #ax.xaxis.set_major_locator(YearLocator())
+        ax.xaxis.set_minor_locator(MonthLocator())
+        ax.xaxis.set_minor_locator(DayLocator())
+        ax.grid(True)
+        #plt.suptitle("User_in_role_id: " + str(results[0]) + "     Activity: "+str(results[1]))
+        #plt.savefig(path_store + 'user_' + str(results[0])+ '_activity_'+str(results[1])+'.png', bbox_inches='tight')
+    fig.subplots_adjust(top=0.9, left=0.1, right=0.9, bottom=0.12)
+    axs.flatten()[-1].legend(loc='lower center', bbox_to_anchor=(0.5, -0.5), ncol=2)
+    plt.show()
 
-### Subplot the states multi-variate single user - By States
-fig, axs = plt.subplots(model.n_components, sharex=True, sharey=True)
-#colours = cm.rainbow(np.linspace(0, 1, model.n_components))
-colours = cm.rainbow(np.linspace(0, 1, len(activities)))
-i=0
-lines=[]
-for ax in axs:
-    # Use fancy indexing to plot data in each state.
-    mask = hidden_states == i
-    i=i+1
-    for j in range(len(activities)):
-        Y = pivoted_data[activities[j]]
-        lines.append( ax.plot_date(dates[mask], Y[mask], ".-", c=colours[j], label =activities[j]))
-    ax.set_title("{0}th hidden state".format(i))
-    # Format the ticks.
-    #ax.xaxis.set_major_locator(YearLocator())
-    ax.xaxis.set_minor_locator(MonthLocator())
-    ax.xaxis.set_minor_locator(DayLocator())
+for ac in activities:
+    pivoted_data = select_pivot_users_activities(data, user, [ac])
+    pivoted_data = pivoted_data.reset_index()
+    pivoted_data['interval_end'] = pd.to_datetime(pivoted_data['interval_end'])
+    pivoted_data = pivoted_data.sort_values(['user_in_role_id', 'interval_end'])
+    model = GaussianHMM(n_components=5, covariance_type="diag", n_iter=1000).fit(pivoted_data.iloc[:,2:])
+    hidden_states = model.predict(pivoted_data.iloc[:,2:])
+    plot_states(model, pivoted_data, [ac], hidden_states)
 
-
-    ax.grid(True)
-    #plt.suptitle("User_in_role_id: " + str(results[0]) + "     Activity: "+str(results[1]))
-    #plt.savefig(path_store + 'user_' + str(results[0])+ '_activity_'+str(results[1])+'.png', bbox_inches='tight')
-fig.subplots_adjust(top=0.9, left=0.1, right=0.9, bottom=0.12)
-axs.flatten()[-1].legend(loc='lower center', bbox_to_anchor=(0.5, -0.5), ncol=2)
-plt.show()
-
+type(pivoted_data[ac])
 ##### PCA ###
 
 ### different types of PCAs, evaluation,
-
-from sklearn.decomposition import PCA
-X=pivoted_data.iloc[:,2:]
-pca = PCA(n_components=4)
-pca.fit(X)
-
 ##!!!!! solve extremization - everythin to be on max
 
-components=np.matrix(np.abs(pca.components_)).transpose()
-normalizer=components.sum(axis=0)
-components=np.divide(components, normalizer)
-weights=np.dot(components,pca.explained_variance_ratio_)
+def calculate_measure_weights():
+    from sklearn.decomposition import PCA
+    X=pivoted_data.iloc[:,2:]
+    pca = PCA(n_components=4)
+    pca.fit(X)
 
+    components=np.matrix(np.abs(pca.components_)).transpose()
+    normalizer=components.sum(axis=0)
+    components=np.divide(components, normalizer)
+    weights=np.dot(components,pca.explained_variance_ratio_)
+    return weights
 
+calculate_measure_weights()
 
 
 
