@@ -96,16 +96,48 @@ def plot_states(model, pivoted_data, activities, hidden_states):
     axs.flatten()[-1].legend(loc='lower center', bbox_to_anchor=(0.5, -0.5), ncol=2)
     plt.show()
 
-for ac in activities:
+#for ac in activities:
+plot_states(model, pivoted_data, [ac], hidden_states)
+model = GaussianHMM(n_components=5, covariance_type="diag", n_iter=1000).fit(pivoted_data.iloc[:,2:])
+    hidden_states = model.predict(pivoted_data.iloc[:,2:])
+    return model, pivoted_data, [ac], hidden_states
+
+def prepare_data(data, user, [ac]):
     pivoted_data = select_pivot_users_activities(data, user, [ac])
     pivoted_data = pivoted_data.reset_index()
     pivoted_data['interval_end'] = pd.to_datetime(pivoted_data['interval_end'])
     pivoted_data = pivoted_data.sort_values(['user_in_role_id', 'interval_end'])
-    model = GaussianHMM(n_components=5, covariance_type="diag", n_iter=1000).fit(pivoted_data.iloc[:,2:])
-    hidden_states = model.predict(pivoted_data.iloc[:,2:])
-    plot_states(model, pivoted_data, [ac], hidden_states)
+    return pivoted_data
 
-type(pivoted_data[ac])
+#### BIC calculation ###
+
+#!!!!!!!!!!!!!!!!!!!!!!! CHECK THIS !!!!!!!!!!!!!!!
+'''
+FOR HMM
+
+Nparams = size(model.A,2)*(size(model.A,2)-1) +
+          size(model.pi,2)-1) +
+          size(model.emission.T,1)*(size(model.emission.T,2)-1)
+Nparams = 13
+BIC = -2*logLike + num_of_params*log(length(x))
+Nparams = Num_of_states*(Num_of_States-1) - Nbzeros_in_transition_matrix
+'''
+'''
+#FOR GMM
+nParam = (k_mixtures – 1) + (k_mixtures * NDimensions ) + k_mixtures * Ndimensions  %for daigonal covariance matrices
+nParam = (k_mixtures – 1) + (k_mixtures * NDimensions ) + k_mixtures * NDimensions * (NDimensions+1)/2; %for full covariance matrices
+'''
+
+
+#### ARIMA #####
+
+from statsmodels.tsa.arima_model import ARIMA
+model = ARIMA(series, order=(5,1,0))
+model_fit = model.fit(disp=0)
+print(model_fit.summary())
+
+
+
 ##### PCA ###
 
 ### different types of PCAs, evaluation,
