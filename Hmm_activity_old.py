@@ -7,6 +7,13 @@ import datetime as dt
 
 data = pd.read_csv('activities_out.csv')
 
+
+#pivoted_data.head()
+#pivoted_data[['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time']]
+
+#pivoted_data=pivoted_data.iloc[:,2:]
+
+
 def get_users_activities(data, user):
     user_data=data[data['user_in_role_id']==user]
     d = user_data.groupby(['user_in_role_id', 'detection_variable_name'])['measure_value'].count()

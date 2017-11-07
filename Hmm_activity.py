@@ -26,31 +26,19 @@ def select_pivot_users_activities(data, user, activities):
 
 activities=['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time']
 
-activities=['sleep_tosleep_time']
+#activities=['sleep_tosleep_time']
 user=66
 pivoted_data=select_pivot_users_activities(data, user, activities)
 
 pivoted_data = pivoted_data.reset_index()
 pivoted_data['interval_end']=pd.to_datetime(pivoted_data['interval_end'])
 
-#pivoted_data
-#pivoted_data = pivoted_data['interval_end'].dt.date
-
 pivoted_data = pivoted_data.sort_values(['user_in_role_id','interval_end'])
-#pivoted_data.head()
-#pivoted_data[['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time']]
-
-#pivoted_data=pivoted_data.iloc[:,2:]
 
 model = GaussianHMM(n_components=4, covariance_type="diag", n_iter=1000).fit(pivoted_data.iloc[:,2:])
 hidden_states=model.predict(pivoted_data.iloc[:,2:])
 
-'''
-Y=pivoted_data['sleep_awake_time']
-Z=pivoted_data['sleep_deep_time']
-W=pivoted_data['sleep_light_time']
-X=pivoted_data['sleep_tosleep_time']
-'''
+
 dates=(pivoted_data['interval_end']).dt.to_pydatetime()
 
 
@@ -108,7 +96,24 @@ plt.show()
 
 ##### PCA ###
 
-from sklearn import
+### different types of PCAs, evaluation,
+
+from sklearn.decomposition import PCA
+X=pivoted_data.iloc[:,2:]
+pca = PCA(n_components=4)
+pca.fit(X)
+
+##!!!!! solve extremization - everythin to be on max
+
+components=np.matrix(np.abs(pca.components_)).transpose()
+normalizer=components.sum(axis=0)
+components=np.divide(components, normalizer)
+weights=np.dot(components,pca.explained_variance_ratio_)
+
+
+
+
+
 
 ############## Check but hard to work for multivariate
 ############################### Color multivariate time series by States
