@@ -24,28 +24,6 @@ def select_pivot_users_activities(data, user, activities):
     return pivot_data
 
 
-#### Create single user single multiple activities cluster
-
-#[ 0.16932597,  0.23696033,  0.2439348 ,  0.11758979,  0.20387557]])
-
-
-#activities=['sleep_tosleep_time']
-
-pivoted_data=select_pivot_users_activities(data, user, activities)
-
-pivoted_data = pivoted_data.reset_index()
-pivoted_data['interval_end']=pd.to_datetime(pivoted_data['interval_end'])
-
-pivoted_data = pivoted_data.sort_values(['user_in_role_id','interval_end'])
-
-model = GaussianHMM(n_components=4, covariance_type="diag", n_iter=1000).fit(pivoted_data.iloc[:,2:])
-hidden_states=model.predict(pivoted_data.iloc[:,2:])
-
-
-dates=(pivoted_data['interval_end']).dt.to_pydatetime()
-
-
-
 
 
 #### Print model parameters
@@ -93,7 +71,6 @@ def plot_states(model, pivoted_data, activities, hidden_states):
     axs.flatten()[-1].legend(loc='lower center', bbox_to_anchor=(0.5, -0.5), ncol=2)
     plt.show()
 
-#for ac in activities:
 
 
 ### This may be better if all data and than select one by one
@@ -157,9 +134,6 @@ def create_map__means_to_clusters(model):
     clusters=list(range(len(model.means_)))
     return dict(zip(clusters, means))
 
-
-activity='sleep_awake_time'
-
 def create_map_means_to_grades(model, activity, activity_extremization):
     extrem=activity_extremization
     means=[model.means_[i][0] for i in range(len(model.means_))]
@@ -195,8 +169,6 @@ res=create_single_variate_clusters(data, activities, activity_extremization, act
 res['sleep_deep_time']['grades']
 
 
-
-
 def calculate_grades(res):
     activities=res.keys()
     for activity in activities:
@@ -210,7 +182,42 @@ def calculate_grades(res):
         grades = map_grades_to_clusters(clusters, map_clusters_grades)
         res[activity].update({'grades':grades})
 
-calculate_grades(res)
+
+### define for different sizes
+def create_higher_factor(res):
+    activities = res.keys()
+    key_for_len=list(activities)[0]
+    size=len(res[key_for_len]['grades'])
+    factor=np.zeros(size)
+    for activity in activities:
+        weight=res[activity]['weight']
+        grades=res[activity]['grades']
+        weighted_grades=np.multiply(weight,grades)
+        factor=factor+weighted_grades
+    return (factor)
+
+factor=create_higher_factor(res)
+
+plt.plot(dates,factor)
+
+type(dates)
+fac=pd.Series(factor, index=list(range(len(factor))), name='factor')
+
+dates_grades=pd.concat([dates, fac], axis=1)
+
+pd.groupby(dates_grades, by=[dates_grades.interval_end.month, dates_grades.interval_end.year])
+
+
+
+a=dates_grades.iloc[0].interval_end
+
+dates_grades['year'] = [y.year for y in dates_grades['interval_end']]
+dates_grades['month'] = [m.month for m in dates_grades['interval_end']]
+dates_grades['day'] = [d.day for d in dates_grades['interval_end']]
+
+
+len(factor)
+len(dates)
 
 activity=res['sleep_awake_time']['name']
 clusters=res['sleep_awake_time']['clusters']
@@ -218,46 +225,9 @@ model=res['sleep_awake_time']['model']
 values=res['sleep_awake_time']['values']
 dates=res['sleep_awake_time']['dates']
 
-plot_single_variate_clusters(activity, model, hidden_states, values, dates)
 
-means=[model.means_[i][0] for  i in range(len(model.means_))]
-clusters_means=dict(zip([0,1,2,3,4], means))
+dates_grades.groupby(['year', 'month'])['factor'].mean()
 
-
-a=np.sort(list(clusters_means.values()))
-grades=dict(zip([1,2,3,4,5], a))
-
-cluster_grades = {}
-for key_clust, value_clust in clusters_means.items():
-    for key_grade, value_grade in grades.items():
-        if value_clust == value_grade:
-            cluster_grades.update({key_clust:key_grade})
-
-# try with compehension
-# try with sorted representation of dict
-a=clusters.map(lambda x: cluster_grades[x])
-
-a=map(lambda x: cluster_grades[x], clusters)
-for m in a:
-   print(m)
-
-b=zip(clusters, a)
-
-list(b)
-for ab in b:
-    print(ab)
-
-
-for ab in a:
-    print(ab)
-
-for i in range(model.n_components):
-    print("{0}th hidden state".format(i))
-    print("mean = ", model.means_[i])
-    print("var = ", np.diag(model.covars_[i]))
-    print()
-
-    return model, pivoted_data, [ac], hidden_states
 
 # assign grades,
 #
