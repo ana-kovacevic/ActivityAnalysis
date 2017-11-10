@@ -26,12 +26,11 @@ def select_pivot_users_activities(data, user, activities):
 
 #### Create single user single multiple activities cluster
 
-activities=['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time', 'sleep_wakeup_num']
-[ 0.16932597,  0.23696033,  0.2439348 ,  0.11758979,  0.20387557]])
+#[ 0.16932597,  0.23696033,  0.2439348 ,  0.11758979,  0.20387557]])
 
 
 #activities=['sleep_tosleep_time']
-user=66
+
 pivoted_data=select_pivot_users_activities(data, user, activities)
 
 pivoted_data = pivoted_data.reset_index()
@@ -75,6 +74,7 @@ def plot_states(model, pivoted_data, activities, hidden_states):
     fig, axs = plt.subplots(model.n_components, sharex=True, sharey=True)
     #colours = cm.rainbow(np.linspace(0, 1, model.n_components))
     colours = cm.rainbow(np.linspace(0, 1, len(activities)))
+    dates=pivoted_data['interval_end']
     i=0
     lines=[]
     for ax in axs:
@@ -97,17 +97,48 @@ def plot_states(model, pivoted_data, activities, hidden_states):
     plt.show()
 
 #for ac in activities:
-plot_states(model, pivoted_data, [ac], hidden_states)
-model = GaussianHMM(n_components=5, covariance_type="diag", n_iter=1000).fit(pivoted_data.iloc[:,2:])
-    hidden_states = model.predict(pivoted_data.iloc[:,2:])
-    return model, pivoted_data, [ac], hidden_states
 
-def prepare_data(data, user, [ac]):
+
+### This may be better if all data and than select one by one
+def prepare_data(data, user, ac):
     pivoted_data = select_pivot_users_activities(data, user, [ac])
     pivoted_data = pivoted_data.reset_index()
     pivoted_data['interval_end'] = pd.to_datetime(pivoted_data['interval_end'])
     pivoted_data = pivoted_data.sort_values(['user_in_role_id', 'interval_end'])
     return pivoted_data
+
+
+##### For single user and each activity -
+# 5 clusters,
+user=66
+activities=['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time', 'sleep_wakeup_num']
+activity_extremization = {'sleep_light_time':'max', 'sleep_deep_time':'max', 'sleep_awake_time':'min', 'sleep_wakeup_num':'min', 'sleep_tosleep_time':'min'}
+activity_weights = {'sleep_light_time':0.1, 'sleep_deep_time':0.3, 'sleep_awake_time':0.1, 'sleep_wakeup_num':0.3, 'sleep_tosleep_time':0.2}
+
+
+
+for ac in activities:
+ pivoted_data=prepare_data(data, user, activities[0])
+
+    model = GaussianHMM(n_components=5, covariance_type="diag", n_iter=1000).fit(pivoted_data.iloc[:, 2:])
+    hidden_states = model.predict(pivoted_data.iloc[:, 2:])
+
+    plot_states(model, pivoted_data, [activities[0]], hidden_states)
+    model.means_
+for i in range(model.n_components):
+    print("{0}th hidden state".format(i))
+    print("mean = ", model.means_[i])
+    print("var = ", np.diag(model.covars_[i]))
+    print()
+
+    return model, pivoted_data, [ac], hidden_states
+
+# assign grades,
+#
+# assign interactivity weights
+
+# calculate higher level factors
+
 
 #### BIC calculation ###
 
