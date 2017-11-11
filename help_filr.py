@@ -1,13 +1,32 @@
 
 
-data = [1 2 1 1 2 2 2 1 2 3 3 2 3 2 1 2 2 3 4 5 5 3 3 2 6 6 5 6 4 3 4 4 4 4 4 4 3 3 2 2];
-model = hmmFit(data, 2, 'discrete');
-model.pi = 0.6661    0.3339;
-model.A =
-    0.8849    0.1151
-    0.1201    0.8799
-model.emission.T =
-    0.2355    0.5232    0.2259    0.0052    0.0049    0.0053
-    0.0053    0.0449    0.2204    0.4135    0.1582    0.1578
-logLike = hmmLogprob(model,data);
-logLike =  -55.8382
+#### ARIMA #####
+
+from statsmodels.tsa.arima_model import ARIMA
+model = ARIMA(series, order=(5,1,0))
+model_fit = model.fit(disp=0)
+print(model_fit.summary())
+
+##################### GaussianMixture ###############################
+gm = GaussianMixture(n_components=3,covariance_type='full').fit(Y)
+gmoutput= gm.predict(Y)
+gmoutput_prob= gm.predict_proba(Y)
+
+plt.figure(figsize=(14, 7))
+# Plot the Models Classifications
+colormap = np.array(['red', 'lime','black'])
+plt.scatter(X.step, oneexample.measure_value, c=colormap[gmoutput], s=40)
+plt.title('GMM Clusters')
+
+### Test again without pull req
+
+np.random.seed(42)
+
+model = hmm.GaussianHMM(n_components=3, covariance_type="full")
+model.startprob_ = np.array([0.6, 0.3, 0.1])
+model.transmat_ = np.array([[0.7, 0.2, 0.1],
+                             [0.3, 0.5, 0.2],
+                             [0.3, 0.3, 0.4]])
+model.means_ = np.array([[0.0, 0.0], [3.0, -3.0], [5.0, 10.0]])
+model.covars_ = np.tile(np.identity(2), (3, 1, 1))
+X, Z = model.sample(100)
