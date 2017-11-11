@@ -7,6 +7,13 @@ import datetime as dt
 
 data = pd.read_csv('activities_out.csv')
 
+
+#pivoted_data.head()
+#pivoted_data[['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time']]
+
+#pivoted_data=pivoted_data.iloc[:,2:]
+
+
 def get_users_activities(data, user):
     user_data=data[data['user_in_role_id']==user]
     d = user_data.groupby(['user_in_role_id', 'detection_variable_name'])['measure_value'].count()
@@ -397,3 +404,25 @@ plt.show()
 #get_users_activities(data, 66)
 
 #user=66
+
+#### Create single user single multiple activities cluster
+
+#[ 0.16932597,  0.23696033,  0.2439348 ,  0.11758979,  0.20387557]])
+
+
+#activities=['sleep_tosleep_time']
+
+'''
+pivoted_data=select_pivot_users_activities(data, user, activities)
+
+pivoted_data = pivoted_data.reset_index()
+pivoted_data['interval_end']=pd.to_datetime(pivoted_data['interval_end'])
+
+pivoted_data = pivoted_data.sort_values(['user_in_role_id','interval_end'])
+
+model = GaussianHMM(n_components=4, covariance_type="diag", n_iter=1000).fit(pivoted_data.iloc[:,2:])
+hidden_states=model.predict(pivoted_data.iloc[:,2:])
+
+
+dates=(pivoted_data['interval_end']).dt.to_pydatetime()
+'''
