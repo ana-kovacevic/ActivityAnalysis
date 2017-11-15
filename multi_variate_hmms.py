@@ -66,8 +66,45 @@ def plot_multivariate_clusters(model, pivoted_data, activities, hidden_states):
         #plt.suptitle("User_in_role_id: " + str(results[0]) + "     Activity: "+str(results[1]))
         #plt.savefig(path_store + 'user_' + str(results[0])+ '_activity_'+str(results[1])+'.png', bbox_inches='tight')
     fig.subplots_adjust(top=0.9, left=0.1, right=0.9, bottom=0.12)
-    axs.flatten()[-1].legend(loc='lower center', bbox_to_anchor=(0.5, -0.5), ncol=2)
+    axs.flatten()[-1].legend(loc='lower center', bbox_to_anchor=(0.5, -0.9), ncol=2)
     plt.show()
+
+    def plot_single_series(activity, values, dates):
+        ### Subplot the states multi-variate single user - By States
+        # fig, axs = plt.subplots(model.n_components, sharex=True, sharey=True)
+        colours = cm.rainbow(np.linspace(0, 1, 1))
+        # colours = cm.rainbow(np.linspace(0, 1, len(activities)))
+        # dates=pivoted_data['interval_end']
+        # i=0
+        # lines=[]
+        # for ax in axs:
+        # Use fancy indexing to plot data in each state.
+        #   mask = hidden_states == i
+        Y = values
+        ax = plt.plot_date(dates, Y, ".-", c=colours[0], label=activity)
+        ax.xaxis.set_minor_locator(MonthLocator())
+        ax.xaxis.set_minor_locator(DayLocator())
+        ax.grid(True)
+        # plt.suptitle("User_in_role_id: " + str(results[0]) + "     Activity: "+str(results[1]))
+        # plt.savefig(path_store + 'user_' + str(results[0])+ '_activity_'+str(results[1])+'.png', bbox_inches='tight')
+        # fig.subplots_adjust(top=0.9, left=0.1, right=0.9, bottom=0.12)
+        # axs.flatten()[-1].legend(loc='lower center', bbox_to_anchor=(0.5, -0.5), ncol=2)
+        plt.show()
+
+    def print_hmm_params(model):
+        print("Transition matrix")
+        print(model.transmat_)
+        print()
+
+        print("Means and vars of each hidden state")
+        for i in range(model.n_components):
+            print("{0}th hidden state".format(i))
+            print("mean = ", model.means_[i])
+            print("var = ", np.diag(model.covars_[i]))
+            print()
+
+
+
 '''
 ########################################################################################
 MAPPING CLUSTERS TO GRADES
@@ -130,7 +167,7 @@ PROGRAM LOGIC
 
 data = pd.read_csv('activities_out.csv')
 
-user=66
+user=68
 activities=['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time', 'sleep_wakeup_num']
 activity_extremization = {'sleep_light_time':'max', 'sleep_deep_time':'max', 'sleep_awake_time':'min', 'sleep_wakeup_num':'min', 'sleep_tosleep_time':'min'}
 activity_weights = {'sleep_light_time':0.1, 'sleep_deep_time':0.3, 'sleep_awake_time':0.1, 'sleep_wakeup_num':0.3, 'sleep_tosleep_time':0.2}
@@ -139,12 +176,18 @@ activity_weights = {'sleep_light_time':0.1, 'sleep_deep_time':0.3, 'sleep_awake_
 model, pivoted_data, activities, hidden_states=create_multi_variate_clusters(data, user, activities, activity_extremization)
 plot_multivariate_clusters(model, pivoted_data, activities, hidden_states)
 
+
+print_hmm_params(model)
+
+
 ### Assign grades to clusters (weighted sum of weights and activity means for each cluster)
 
 grades=calculate_grades(model=model, clusters=hidden_states, activity_weights=activity_weights)
 
 
-#### Plot factor on monthly level
+''' 
+Group and Plot factor on monthly level
+'''
 
 dates=pivoted_data['interval_end']
 #dat=pd.Series(dates, index=list(range(len(dates))), name='dates')
@@ -163,7 +206,27 @@ print(factor)
 
 plot_single_series('motility', factor, dates)
 
-a=dates_grades.iloc[0].interval_end
+def plot_single_series(activity, values, dates):
+    ### Subplot the states multi-variate single user - By States
+    #fig, axs = plt.subplots(model.n_components, sharex=True, sharey=True)
+    colours = cm.rainbow(np.linspace(0, 1, 1))
+    #colours = cm.rainbow(np.linspace(0, 1, len(activities)))
+    #dates=pivoted_data['interval_end']
+    #i=0
+    #lines=[]
+    #for ax in axs:
+        # Use fancy indexing to plot data in each state.
+     #   mask = hidden_states == i
+    Y = values
+    ax=plt.plot_date(dates, Y, ".-", c=colours[0], label =activity )
+    ax.xaxis.set_minor_locator(MonthLocator())
+    ax.xaxis.set_minor_locator(DayLocator())
+    ax.grid(True)
+        #plt.suptitle("User_in_role_id: " + str(results[0]) + "     Activity: "+str(results[1]))
+        #plt.savefig(path_store + 'user_' + str(results[0])+ '_activity_'+str(results[1])+'.png', bbox_inches='tight')
+    #fig.subplots_adjust(top=0.9, left=0.1, right=0.9, bottom=0.12)
+    #axs.flatten()[-1].legend(loc='lower center', bbox_to_anchor=(0.5, -0.5), ncol=2)
+    plt.show()
 
 
 def plot_single_series(activity, values, dates):
