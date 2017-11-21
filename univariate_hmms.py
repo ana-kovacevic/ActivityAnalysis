@@ -6,25 +6,39 @@ import numpy as np
 import datetime as dt
 
 
-# gets all activities for specified user and returns activity names and counts
+
 def get_users_activities(data, user):
+    '''
+    :param data: data 
+    :param user: user elderly
+    :return: all activities
+    gets all activities for specified user and returns activity names and counts
+    '''
     user_data=data[data['user_in_role_id']==user]
     d = user_data.groupby(['user_in_role_id', 'detection_variable_name'])['measure_value'].count()
     d.rename(columns={'measure_value':'count_measure_value'}, inplace=True)
     d=pd.DataFrame(d)
     return d
 
-### Pivots multivariate data - each activity becomes column
-### Unnecessary step for single variate time series - maybe remove and adjust prepare data method
+
+
 def select_pivot_users_activities(data, user, activities):
+    '''
+    Pivots multivariate data - each activity becomes column
+    Unnecessary step for single variate time series - maybe remove and adjust prepare data method
+    '''
     user_data=data[data['user_in_role_id']==user]
     user_data=user_data[user_data['detection_variable_name'].isin(activities)]
     pivot_data = user_data.pivot_table(index=['user_in_role_id', 'interval_end'], columns='detection_variable_name',values='Normalised')
     return pivot_data
 
 
-### Takes pivoted data and transforms it in regular DataFrame. Converts dates to date format (for plotting) , sorts data based on dates in order to preserve temporal order
 def prepare_data(data, user, ac):
+    '''
+    Takes pivoted data and transforms it in regular DataFrame. 
+    Converts dates to date format (for plotting) 
+    Sorts data based on dates in order to preserve temporal order 
+    '''
     pivoted_data = select_pivot_users_activities(data, user, [ac])
     pivoted_data = pivoted_data.reset_index()
     pivoted_data['interval_end'] = pd.to_datetime(pivoted_data['interval_end'])
@@ -215,6 +229,34 @@ def print_hmm_params(model):
 
     print_hmm_params(model)
 
+
+def optimize_number_of_clusters(data, range_of_clusters):
+    '''    
+    :param data: 
+    :param range_of_clusters: 
+    :return: 
+    '''
+
+    best_value=np.inf # create for maximization and minimization
+    best_model=None
+    for n_states in range_of_clusters:
+        model = GaussianHMM(n_components=n_states, covariance_type="diag", n_iter=1000).fit(data)
+        log_likelihood = model.score(data)
+        n_features = 1 ### here adapt for multi-variate
+        n_params = n_states * (n_states - 1) + 2 * n_features * n_states
+        logN = np.log(len(data))
+        bic = -2 * log_likelihood + n_params * logN
+        if bic < best_value:
+            best_value, best_model = bic, model
+    return best_value, best_model
+
+
+
+
+
+
+
+
 '''
 ###########################################################################
 PROGRAM LOGIC
@@ -229,6 +271,15 @@ user=66 # selects one user id
 activities=['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time', 'sleep_wakeup_num']
 activity_extremization = {'sleep_light_time':'max', 'sleep_deep_time':'max', 'sleep_awake_time':'min', 'sleep_wakeup_num':'min', 'sleep_tosleep_time':'min'}
 activity_weights = {'sleep_light_time':0.1, 'sleep_deep_time':0.3, 'sleep_awake_time':0.1, 'sleep_wakeup_num':0.3, 'sleep_tosleep_time':0.2}
+
+pivoted_data=prepare_data(data, user, 'sleep_tosleep_time')
+
+optimize_number_of_clusters(pivoted_data[['sleep_tosleep_time']], [2,3,4,5,6,7,8,9,10])
+
+
+
+'''
+pivoted_data.head()
 
 res=create_single_variate_clusters(data, activities, activity_extremization, activity_weights)
 plot_single_variate_multiple_activities(res)
@@ -264,3 +315,4 @@ dates_grades['month'] = [m.month for m in dates_grades['interval_end']]
 dates_grades['day'] = [d.day for d in dates_grades['interval_end']]
 
 
+'''
