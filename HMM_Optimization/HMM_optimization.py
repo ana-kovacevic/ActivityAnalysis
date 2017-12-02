@@ -1,5 +1,5 @@
 from hmmlearn.hmm import GaussianHMM
-import data_preparation as dp
+
 import numpy as np
 
 import pandas as pd
@@ -8,6 +8,7 @@ import pandas as pd
 ### Creates single variate HMM models for each activity.
 ### This method should only be called. It calls preparation methods and returns dictionary with elements for plotting and mapping to states
 def create_single_variate_clusters(data, user, activities, activity_extremization, activity_weights):
+    import data_preparation as dp
     clusters_activities = {}
     for ac in activities:
         pivoted_data=dp.prepare_data(data, user, [ac])
