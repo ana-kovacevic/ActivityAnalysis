@@ -7,18 +7,6 @@ import datetime as dt
 
 
 
-def get_users_activities(data, user):
-    '''
-    :param data: data 
-    :param user: user elderly
-    :return: all activities
-    gets all activities for specified user and returns activity names and counts
-    '''
-    user_data=data[data['user_in_role_id']==user]
-    d = user_data.groupby(['user_in_role_id', 'detection_variable_name'])['measure_value'].count()
-    d.rename(columns={'measure_value':'count_measure_value'}, inplace=True)
-    d=pd.DataFrame(d)
-    return d
 
 
 
@@ -258,15 +246,29 @@ PROGRAM LOGIC
 ###########################################################################
 '''
 
+import data_preparation
+
+data = pd.read_csv('activities_out.csv') # Reads data with original and normalized values for each user and activity
+
+
+from data_preparation import get_users_activities
+get_users_activities(data, 14)
+
+
+import pandas as pd
+
 ##### For single user and each activity -
 # 5 clusters,
-data = pd.read_csv('activities_out.csv') # Reads data with original and normalized values for each user and activity
+
+
 
 data['user_in_role_id'].unique()
 
 data.head(2)
 
-get_users_activities(data, 14)
+
+
+data.head(5)
 
 user=66 # selects one user id
 activities=['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time', 'sleep_wakeup_num']
