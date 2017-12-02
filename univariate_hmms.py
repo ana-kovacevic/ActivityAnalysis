@@ -1,6 +1,6 @@
 import pandas as pd
 import data_preparation as dp
-import HMM_Optimization as hmm_opt
+import HMM_Optimization.HMM_optimization as hmm_opt
 from matplotlib import cm, pyplot as plt
 from matplotlib.dates import YearLocator, MonthLocator, DayLocator
 import numpy as np
@@ -21,7 +21,7 @@ activities=['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tos
 activity_extremization = {'sleep_light_time':'max', 'sleep_deep_time':'max', 'sleep_awake_time':'min', 'sleep_wakeup_num':'min', 'sleep_tosleep_time':'min'}
 activity_weights = {'sleep_light_time':0.1, 'sleep_deep_time':0.3, 'sleep_awake_time':0.1, 'sleep_wakeup_num':0.3, 'sleep_tosleep_time':0.2}
 
-hmm_opt.
+clusters66=hmm_opt.create_single_variate_clusters(data, user, activities, activity_extremization, activity_weights)
 
 
 

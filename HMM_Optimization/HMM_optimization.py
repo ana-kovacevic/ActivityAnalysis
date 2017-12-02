@@ -10,7 +10,7 @@ import pandas as pd
 def create_single_variate_clusters(data, user, activities, activity_extremization, activity_weights):
     clusters_activities = {}
     for ac in activities:
-        pivoted_data=dp.prepare_data(data, user, ac)
+        pivoted_data=dp.prepare_data(data, user, [ac])
         model = GaussianHMM(n_components=5, covariance_type="full", n_iter=1000).fit(pivoted_data.iloc[:, 2:])
         hidden_states = model.predict(pivoted_data.iloc[:, 2:])
         extreme=activity_extremization[ac]
