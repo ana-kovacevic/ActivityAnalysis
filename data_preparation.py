@@ -68,7 +68,7 @@ def create_multi_variate_clusters(data, user, activities, activity_extremization
     pivoted_data = pivoted_data.reset_index()
     pivoted_data['interval_end'] = pd.to_datetime(pivoted_data['interval_end'])
     pivoted_data = pivoted_data.sort_values(['user_in_role_id', 'interval_end'])
-    model = GaussianHMM(n_components=5, covariance_type="diag", n_iter=1000).fit(pivoted_data.iloc[:, 2:])
+    model = GaussianHMM(n_components=5, covariance_type="full", n_iter=1000).fit(pivoted_data.iloc[:, 2:])
     hidden_states = model.predict(pivoted_data.iloc[:, 2:])
     return(model, pivoted_data, activities, hidden_states)
 

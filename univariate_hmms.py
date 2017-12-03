@@ -23,21 +23,21 @@ activity_weights = {'sleep_light_time':0.1, 'sleep_deep_time':0.3, 'sleep_awake_
 
 clusters66=hmm_opt.create_single_variate_clusters(data, user, activities, activity_extremization, activity_weights)
 
-clusters66m=
+
 
 model, pivoted_data, activities, hidden_states=dp.create_multi_variate_clusters(data, user, activities, activity_extremization)
 
 model=clusters66['sleep_light_time']['model']
 
-dict4json={'user': user, 'Activity': 'sleep_deep_time', 'means':model.means_.tolist(), 'covars':model.covars_.tolist(), 'transmat':model.transmat_.tolist()}
+dict4json_single={'user': user, 'Activity': 'sleep_deep_time', 'means':model.means_.tolist(), 'covars':model.covars_.tolist(), 'transmat':model.transmat_.tolist()}
 
-
+dict4json_multi={'user': user, 'Activities': activities, 'means':model.means_.tolist(), 'covars':model.covars_.tolist(), 'transmat':model.transmat_.tolist()}
 
 
 type(model)
 
 
-
+model.covars_
 
 
 ########## Model persist
@@ -50,8 +50,8 @@ import json
 import jsonpickle
 serialized = jsonpickle.encode(model)
 
-with open('JSONdata.json', 'w') as outfile:
-    json.dump(dict4json, outfile)
+with open('JSONdata_multi.json', 'w') as outfile:
+    json.dump(dict4json_multi, outfile)
 
 jsonpickle.decode(serialized)
 
