@@ -47,3 +47,32 @@ def prepare_data(data, user, activities):
     pivoted_data = pivoted_data.sort_values(['user_in_role_id', 'interval_end'])
     return pivoted_data
 
+'''
+##########################################################################
+DATA PREPARATION MULTIVARIATE
+###########################################################################
+'''
+#### Check all activities and counts of appearences for single user
+def select_pivot_users_activities_multi_variate(data, user, activities, activity_extremization):
+    user_data=data[data['user_in_role_id']==user]
+    user_data=user_data[user_data['detection_variable_name'].isin(activities)]
+    pivot_data = user_data.pivot_table(index=['user_in_role_id', 'interval_end'], columns='detection_variable_name',values='Normalised')
+    invert_mins(activity_extremization, pivot_data) # difference with single variate - all activities are set to max extremization
+    return pivot_data
+
+
+def create_multi_variate_clusters(data, user, activities, activity_extremization):
+    pivoted_data = select_pivot_users_activities_multi_variate(data, user, activities, activity_extremization)
+    pivoted_data = pivoted_data.reset_index()
+    pivoted_data['interval_end'] = pd.to_datetime(pivoted_data['interval_end'])
+    pivoted_data = pivoted_data.sort_values(['user_in_role_id', 'interval_end'])
+    model = GaussianHMM(n_components=5, covariance_type="diag", n_iter=1000).fit(pivoted_data.iloc[:, 2:])
+    hidden_states = model.predict(pivoted_data.iloc[:, 2:])
+    return(model, pivoted_data, activities, hidden_states)
+
+
+def invert_mins(activity_extremization, pivoted_data):
+    keys=list(activity_extremization.keys())
+    for key in keys:
+        if activity_extremization[key]=='min':
+           pivoted_data[key]=pivoted_data[key].apply(lambda x: 1-x)

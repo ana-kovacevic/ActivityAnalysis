@@ -1,5 +1,5 @@
 import pandas as pd
-import data_preparation as dp
+#import data_preparation as dp
 import HMM_Optimization.HMM_optimization as hmm_opt
 from matplotlib import cm, pyplot as plt
 from matplotlib.dates import YearLocator, MonthLocator, DayLocator
@@ -13,7 +13,7 @@ PROGRAM LOGIC
 '''
 
 data = pd.read_csv('Data/activities_out.csv') # Reads data with original and normalized values for each user and activity
-dp.get_users_activities(data, 66)
+#dp.get_users_activities(data, 66)
 
 
 user=66 # selects one user id
@@ -23,8 +23,48 @@ activity_weights = {'sleep_light_time':0.1, 'sleep_deep_time':0.3, 'sleep_awake_
 
 clusters66=hmm_opt.create_single_variate_clusters(data, user, activities, activity_extremization, activity_weights)
 
+clusters66m=
 
 
+model=clusters66['sleep_light_time']['model']
+
+dict4json={'user': user, 'Activity': 'sleep_deep_time', 'means':model.means_.tolist(), 'covars':model.covars_.tolist(), 'transmat':model.transmat_.tolist()}
+
+
+
+
+type(model)
+
+
+
+
+
+########## Model persist
+from sklearn.externals import joblib
+joblib.dump(remodel, "filename.pkl")
+joblib.load("filename.pkl")
+
+##### Model persist JSON
+import json
+import jsonpickle
+serialized = jsonpickle.encode(model)
+
+with open('JSONdata.json', 'w') as outfile:
+    json.dump(dict4json, outfile)
+
+jsonpickle.decode(serialized)
+
+type(serialized)
+
+print(serialized)
+
+my_car_obj = jsonpickle.decode(model)
+print
+my_car_obj.drive()
+
+clusters66.keys()
+
+pd.DataFrame(clusters66)
 
 
 

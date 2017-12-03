@@ -4,11 +4,11 @@ import pandas as pd
 
 '''
 ##########################################################################
-DATA PREPARATION
+DATA PREPARATION MULTIVARIATE
 ###########################################################################
 '''
 #### Check all activities and counts of appearences for single user
-def select_pivot_users_activities(data, user, activities, activity_extremization):
+def select_pivot_users_activities_multi_variate(data, user, activities, activity_extremization):
     user_data=data[data['user_in_role_id']==user]
     user_data=user_data[user_data['detection_variable_name'].isin(activities)]
     pivot_data = user_data.pivot_table(index=['user_in_role_id', 'interval_end'], columns='detection_variable_name',values='Normalised')
@@ -17,7 +17,7 @@ def select_pivot_users_activities(data, user, activities, activity_extremization
 
 
 def create_multi_variate_clusters(data, user, activities, activity_extremization):
-    pivoted_data = select_pivot_users_activities(data, user, activities, activity_extremization)
+    pivoted_data = select_pivot_users_activities_multi_variate(data, user, activities, activity_extremization)
     pivoted_data = pivoted_data.reset_index()
     pivoted_data['interval_end'] = pd.to_datetime(pivoted_data['interval_end'])
     pivoted_data = pivoted_data.sort_values(['user_in_role_id', 'interval_end'])
