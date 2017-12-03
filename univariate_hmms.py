@@ -1,5 +1,5 @@
 import pandas as pd
-#import data_preparation as dp
+import data_preparation as dp
 import HMM_Optimization.HMM_optimization as hmm_opt
 from matplotlib import cm, pyplot as plt
 from matplotlib.dates import YearLocator, MonthLocator, DayLocator
@@ -25,6 +25,7 @@ clusters66=hmm_opt.create_single_variate_clusters(data, user, activities, activi
 
 clusters66m=
 
+model, pivoted_data, activities, hidden_states=dp.create_multi_variate_clusters(data, user, activities, activity_extremization)
 
 model=clusters66['sleep_light_time']['model']
 

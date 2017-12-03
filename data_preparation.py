@@ -1,4 +1,5 @@
 import pandas as pd
+from hmmlearn.hmm import GaussianHMM
 
 
 ### Maybe add this to data exploration

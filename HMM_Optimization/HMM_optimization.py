@@ -18,8 +18,6 @@ def create_single_variate_clusters(data, user, activities, activity_extremizatio
     return clusters_activities
 
 
-
-
 def optimize_number_of_clusters(data, range_of_clusters):
     '''    
     :param data: 
