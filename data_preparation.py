@@ -63,6 +63,7 @@ def select_pivot_users_activities_multi_variate(data, user, activities, activity
 
 
 def create_multi_variate_clusters(data, user, activities, activity_extremization):
+    from hmmlearn.hmm import GaussianHMM
     pivoted_data = select_pivot_users_activities_multi_variate(data, user, activities, activity_extremization)
     pivoted_data = pivoted_data.reset_index()
     pivoted_data['interval_end'] = pd.to_datetime(pivoted_data['interval_end'])
