@@ -27,81 +27,15 @@ clusters66=hmm_opt.create_single_variate_clusters(data, user, activities, activi
 
 model, pivoted_data, activities, hidden_states=dp.create_multi_variate_clusters(data, user, activities, activity_extremization)
 
+import model_persistance as mp
+dict=mp.create_dict_activities_means_covars(user,activities,model)
+
+dict.keys()
+
+
 model=clusters66['sleep_light_time']['model']
 
-'''
-MODEL PERSISTANCE JSON
-'''
-dict4json_single={'user': user, 'Activity': 'sleep_deep_time', 'means':model.means_.tolist(), 'covars':model.covars_.tolist(), 'transmat':model.transmat_.tolist()}
 
-dict4json_multi={'user': {'id':user, 'Activities': activities, 'means':model.means_.tolist(), 'covars':model.covars_.tolist(), 'transmat':model.transmat_.tolist()}}
-
-
-means=model.means_
-covars=model.covars_
-transmat=model.transmat_
-
-
-
-def create_dict_activities_means_covars(activities, means, covars):
-    '''
-    :param activities: 
-    :param means: 
-    :param covars: 
-    :return: 
-    '''
-
-    for ac in zip (activities, means, covars):
-        dict.update({'user':
-                         {'transmat':transmat,
-                         {ac[0]:{'means':means[0],'covars':covars[0]}}
-                         }
-                       })
-
-    dict = {}
-    for ac in zip (activities, means, covars):
-        dict.update({ac[0]:{'means':means[0].tolist(),'covars':covars[0].tolist()}})
-
-dict_users={user:dict}
-
-
-
-import json
-with open('JSONdata_multi.json', 'w') as outfile:
-    json.dump(dict_users, outfile)
-
-model.means_
-
-type(model)
-
-
-model.covars_
-
-
-########## Model persist
-from sklearn.externals import joblib
-joblib.dump(remodel, "filename.pkl")
-joblib.load("filename.pkl")
-
-##### Model persist JSON
-
-import jsonpickle
-serialized = jsonpickle.encode(model)
-
-
-jsonpickle.decode(serialized)
-
-type(serialized)
-
-print(serialized)
-
-my_car_obj = jsonpickle.decode(model)
-print
-my_car_obj.drive()
-
-clusters66.keys()
-
-pd.DataFrame(clusters66)
 
 
 
