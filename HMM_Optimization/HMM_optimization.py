@@ -26,9 +26,9 @@ def optimize_number_of_clusters(data, range_of_clusters):
     '''
     best_value=np.inf # create for maximization and minimization
     best_model=None
-    pivoted_data = prepare_data(data, user, [ac])
+    #pivoted_data = prepare_data(data, user, [ac]) old version for data preparation
     for n_states in range_of_clusters:
-        model = GaussianHMM(n_components=n_states, covariance_type="full", n_iter=1000).fit(data)
+        model = GaussianHMM(n_components=n_states, covariance_type="diag", n_iter=1000).fit(data)
         log_likelihood = model.score(data)
         criteria=bic_criteria(data, log_likelihood, model)
         if criteria < best_value:
@@ -46,7 +46,7 @@ def bic_criteria(data, log_likelihood, model):
     :param model: 
     :return: 
     '''
-    n_features = data.shape(2)  ### here adapt for multi-variate
+    n_features = data.shape[1]  ### here adapt for multi-variate
     n_states=len(model.means_)
     n_params = n_states * (n_states - 1) + 2 * n_features * n_states
     logN = np.log(len(data))
@@ -60,7 +60,7 @@ def aic_criteria(data, log_likelihood, model):
     :param model: 
     :return: 
     '''
-    n_features = data.shape(2)  ### here adapt for multi-variate
+    n_features = data.shape[1]  ### here adapt for multi-variate
     n_states=len(model.means_)
     n_params = n_states * (n_states - 1) + 2 * n_features * n_states
     aic = -2 * log_likelihood + n_params

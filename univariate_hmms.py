@@ -22,8 +22,45 @@ activity_extremization = {'sleep_light_time':'max', 'sleep_deep_time':'max', 'sl
 activity_weights = {'sleep_light_time':0.1, 'sleep_deep_time':0.3, 'sleep_awake_time':0.1, 'sleep_wakeup_num':0.3, 'sleep_tosleep_time':0.2}
 
 
+
+
+'''ß
+Create and store optimal single variate hmm models for each activity
+'''
+
+users=[66,67,68]
 optimal_hmms_single_variate=[]
-activities=dp.get_dict_ges_activities()
+subfactor_activities=dp.get_dict_ges_activities()
+
+dp.get_users_activities(data,66)
+
+pp=dp.prepare_data(data,66,['sleep_deep_time'])
+
+for user in users:
+    for subfactor, activities in subfactor_activities.items():
+        for activity in activities:
+            prepared_data = dp.prepare_data(data,user,[activity])
+            best_value, best_model = hmm_opt.optimize_number_of_clusters(prepared_data.iloc[: ,2:], list(range(2,11)))
+            optimal_hmms_single_variate.append(best_model)
+
+for a in optimal_hmms_single_variate:
+    print(a)
+
+len(optimal_hmms_single_variate)
+list(range(2,10))
+type(a)
+a
+aa.shape[0]
+
+from hmmlearn.hmm import GaussianHMM
+
+aa=pp.iloc[:, 2:]
+
+model = GaussianHMM(n_components=5, covariance_type="full", n_iter=1000).fit(aa)
+
+
+a=activities.keys()
+
 hmm_opt.optimize_number_of_clusters(data)
 
 
