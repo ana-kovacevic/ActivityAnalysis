@@ -21,11 +21,21 @@ activities=['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tos
 activity_extremization = {'sleep_light_time':'max', 'sleep_deep_time':'max', 'sleep_awake_time':'min', 'sleep_wakeup_num':'min', 'sleep_tosleep_time':'min'}
 activity_weights = {'sleep_light_time':0.1, 'sleep_deep_time':0.3, 'sleep_awake_time':0.1, 'sleep_wakeup_num':0.3, 'sleep_tosleep_time':0.2}
 
+
+optimal_hmms_single_variate=[]
+activities=dp.get_dict_ges_activities()
+hmm_opt.optimize_number_of_clusters(data)
+
+
 clusters66=hmm_opt.create_single_variate_clusters(data, user, activities, activity_extremization, activity_weights)
 
 
+dp.get_users_activities(data, 68)
+
 
 model, pivoted_data, activities, hidden_states=dp.create_multi_variate_clusters(data, user, activities, activity_extremization)
+
+model.means_
 
 import model_persistance as mp
 dict=mp.create_dict_activities_means_covars(user,activities,model)

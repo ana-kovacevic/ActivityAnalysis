@@ -20,13 +20,13 @@ def create_single_variate_clusters(data, user, activities, activity_extremizatio
 
 def optimize_number_of_clusters(data, range_of_clusters):
     '''    
-    :param data: 
-    :param range_of_clusters: 
+    :param data: prepared data (values of activities by columns) 
+    :param range_of_clusters: range of best number expected e.g. 2:10
     :return: 
     '''
-
     best_value=np.inf # create for maximization and minimization
     best_model=None
+    pivoted_data = prepare_data(data, user, [ac])
     for n_states in range_of_clusters:
         model = GaussianHMM(n_components=n_states, covariance_type="full", n_iter=1000).fit(data)
         log_likelihood = model.score(data)
@@ -34,6 +34,9 @@ def optimize_number_of_clusters(data, range_of_clusters):
         if criteria < best_value:
             best_value, best_model = criteria, model
     return best_value, best_model
+
+### TODO add method for research purposes
+#def log_hmm_optimization():
 
 
 def bic_criteria(data, log_likelihood, model):

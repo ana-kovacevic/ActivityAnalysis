@@ -78,3 +78,19 @@ def invert_mins(activity_extremization, pivoted_data):
     for key in keys:
         if activity_extremization[key]=='min':
            pivoted_data[key]=pivoted_data[key].apply(lambda x: 1-x)
+
+def get_dict_ges_activities():
+    #Generalize method for arbitrary GES, GEF and reading from database
+    activity_hierarchy={}
+    physical_activity = {'physical_activity': {'physicalactivity_calories', 'physicalactivity_intense_time',
+                                               'physicalactivity_moderate_time', 'physicalactivity_soft_time'}}
+    quality_of_sleep = {
+        'quality_of_sleep': {'sleep_awake_time', 'sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time',
+                             'sleep_wakeup_num'}}
+    walking = {'walking': {'walk_distance', 'walk_steps'}}
+    activity_hierarchy.update(physical_activity)
+    activity_hierarchy.update(quality_of_sleep)
+    activity_hierarchy.update(walking)
+    return activity_hierarchy
+
+
