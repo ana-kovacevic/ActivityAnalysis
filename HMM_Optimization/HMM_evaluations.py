@@ -181,3 +181,19 @@ class SelectorCV(ModelSelector):
                 best_score, best_model = avg, model
 
         return best_model if best_model is not None else self.base_model(self.n_constant)
+
+    # !!!!!!!!!!!!!!!!!!!!!!! CHECK THIS !!!!!!!!!!!!!!!
+    '''
+    FOR HMM
+
+    Nparams = size(model.A,2)*(size(model.A,2)-1) +
+              size(model.pi,2)-1) +
+              size(model.emission.T,1)*(size(model.emission.T,2)-1)
+    Nparams = 13
+    BIC = -2*logLike + num_of_params*log(length(x))
+    Nparams = Num_of_states*(Num_of_States-1) - Nbzeros_in_transition_matrix
+    '''
+    '''
+    #FOR GMM
+    nParam = (k_mixtures – 1) + (k_mixtures * NDimensions ) + k_mixtures * Ndimensions  %for daigonal covariance matrices
+    nParam = (k_mixtures – 1) + (k_mixtures * NDimensions ) + k_mixtures * NDimensions * (NDimensions+1)/2; %for full covariance matrices
