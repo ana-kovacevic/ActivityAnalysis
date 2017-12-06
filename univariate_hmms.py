@@ -22,57 +22,49 @@ activity_extremization = {'sleep_light_time':'max', 'sleep_deep_time':'max', 'sl
 activity_weights = {'sleep_light_time':0.1, 'sleep_deep_time':0.3, 'sleep_awake_time':0.1, 'sleep_wakeup_num':0.3, 'sleep_tosleep_time':0.2}
 
 
-
-
 '''ß
 Create and store optimal single variate hmm models for each activity
 '''
 
+#dp.get_users_activities(data,66)
+#pp=dp.prepare_data(data,66,['sleep_deep_time'])
+
 users=[66,67,68]
-optimal_hmms_single_variate=[]
-subfactor_activities=dp.get_dict_ges_activities()
+#####Persist models
 
-dp.get_users_activities(data,66)
+hmm_opt.create_single_variate_clusters(66, ['sleep_light_time', activities, activity_extremization, activity_weights)
 
-pp=dp.prepare_data(data,66,['sleep_deep_time'])
+def create_dict_activities_means_covars(user, activities, model):
+    '''    
+    :param model: HMM model
+    :return:
+     Creates dict of the Hmm model for persistance in JSON
+    '''
+    means = model.means_
+    covars = model.covars_
+    transmat = model.transmat_
 
-for user in users:
-    for subfactor, activities in subfactor_activities.items():
-        for activity in activities:
-            prepared_data = dp.prepare_data(data,user,[activity])
-            best_value, best_model = hmm_opt.optimize_number_of_clusters(prepared_data.iloc[: ,2:], list(range(2,11)))
-            optimal_hmms_single_variate.append(best_model)
+    dict = {}
+    for ac in zip (activities, means, covars):
+        dict.update({ac[0]:{'means':means[0].tolist(),'covars':covars[0].tolist()}})
+    dict.update({'transmat': transmat})
+    dict={user:dict}
 
-for a in optimal_hmms_single_variate:
-    print(a)
-
-len(optimal_hmms_single_variate)
-list(range(2,10))
-type(a)
-a
-aa.shape[0]
-
-from hmmlearn.hmm import GaussianHMM
-
-aa=pp.iloc[:, 2:]
-
-model = GaussianHMM(n_components=5, covariance_type="full", n_iter=1000).fit(aa)
+    return dict
 
 
-a=activities.keys()
 
-hmm_opt.optimize_number_of_clusters(data)
-
-
-clusters66=hmm_opt.create_single_variate_clusters(data, user, activities, activity_extremization, activity_weights)
+import pickle
 
 
-dp.get_users_activities(data, 68)
+
+a=load_pickle_hmm(66, "sleep_deep_time")
 
 
-model, pivoted_data, activities, hidden_states=dp.create_multi_variate_clusters(data, user, activities, activity_extremization)
+model=joblib.load(path + '/' + filename + '.pkl')
 
-model.means_
+
+
 
 import model_persistance as mp
 dict=mp.create_dict_activities_means_covars(user,activities,model)
@@ -80,80 +72,13 @@ dict=mp.create_dict_activities_means_covars(user,activities,model)
 dict.keys()
 
 
-model=clusters66['sleep_light_time']['model']
 
 
 
 
 
-##### For single user and each activity -
-# 5 clusters,
 
 
-
-data['user_in_role_id'].unique()
-
-data.head(2)
-
-
-
-data.head(5)
-
-
-pivoted_data=prepare_data(data, user, 'sleep_tosleep_time')
-
-train=pivoted_data.iloc[:-30,:]
-test=pivoted_data.iloc[-30:,:]
-
-result=optimize_number_of_clusters(train[['sleep_tosleep_time']], [2,3,4,5,6,7,8,9,10])
-
-model=result[1]
-
-predictions=model.predict(test[['sleep_tosleep_time']])
-
-model.means_
-
-def mean_to_state(state):
-    if state==0:
-        return(0.12079959)
-    elif state==1:
-        return (0.21201418)
-    else:
-        return (0.73009568)
-
-results=list(map(mean_to_state, predictions))
-
-from sklearn import metrics
-
-metrics.mean_squared_error(test[['sleep_tosleep_time']],results)
-
-type(test['sleep_tosleep_time'])
-
-type(pd.Series(results))
-
-plt.scatter(test['sleep_tosleep_time'], results)
-
-panda=pd.concat([test['sleep_tosleep_time'], pd.Series(results)], axis=1)
-
-len(y)
-len(results)
-y=test['sleep_tosleep_time']
-
-fig, ax = plt.subplots()
-ax.scatter(y, results, edgecolors=(0, 0, 0))
-ax.set_xlabel('Measured')
-ax.set_ylabel('Predicted')
-plt.show()
-
-
-X, Z = model.sample(30)
-
-
-test_values=list(test['sleep_tosleep_time'])
-pd.DataFrame(test_values, results)
-
-
-test[['sleep_tosleep_time']]
 
 
 

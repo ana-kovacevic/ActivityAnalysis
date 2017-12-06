@@ -1,7 +1,41 @@
 from hmmlearn.hmm import GaussianHMM
 import numpy as np
-#import data_preparation as dp
+import data_preparation as dp
 import pandas as pd
+
+
+
+
+
+
+
+def get_optimal_hmms_for_users_single_variate(data, users):
+    optimal_hmms_single_variate = []
+    subfactor_activities = dp.get_dict_ges_activities()
+    for user in users:
+        for subfactor, activities in subfactor_activities.items():
+            for activity in activities:
+                prepared_data = dp.prepare_data(data,user,[activity])
+                best_value, best_model = optimize_number_of_clusters(prepared_data.iloc[: ,2:], list(range(2,11)))
+                best=(user, activity, best_model)
+                optimal_hmms_single_variate.append(best)
+    return optimal_hmms_single_variate
+
+
+def get_optimal_hmms_for_users_multi_variate(data, users):
+    optimal_hmms_single_variate = []
+    subfactor_activities = dp.get_dict_ges_activities()
+    for user in users:
+        for subfactor in subfactor_activities.keys():
+                activities=subfactor_activities[subfactor]
+                prepared_data = dp.prepare_data(data,user,activities)
+                best_value, best_model = optimize_number_of_clusters(prepared_data.iloc[: ,2:], list(range(2,11)))
+                best=(user, subfactor, best_model)
+                optimal_hmms_single_variate.append(best)
+    return optimal_hmms_single_variate
+
+
+
 
 
 ### Creates single variate HMM models for each activity.

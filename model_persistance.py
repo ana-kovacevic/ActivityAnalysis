@@ -2,22 +2,72 @@
 MODEL PERSISTANCE JSON
 '''
 
-def create_dict_activities_means_covars(user, activities, model):
-    '''    
-    :param model: HMM model
+import pickle
+########## Write mdodel in pickle
+def persist_pickle_hmm(model, path, filename):
+    '''
+    :param model: 
+    :param path: 
+    :param filename: 
+    :return:
+     Persists both multi and single variate models
+    '''
+    whole_path=path+filename
+    #filehandler = open(str(whole_path), 'w')
+    file=open(whole_path, "wb")
+    pickle.dump(model, file)
+    #joblib.dump(model, whole_path+'.pkl')
+
+
+def create_path(user, activity):
+    path = 'Data/citizen_id_' + str(user) + '/'
+    file_name='citizen_id_'+str(user)+'_activity_'+activity
+    extension='.pkl'
+    whole_path=path+file_name+extension
+    return whole_path
+
+
+
+def load_pickle_hmm_single_variate(user, activity):
+    path=create_path(user, activity)
+    file = open(path, "rb")
+    model=pickle.load(file)
+    return model
+
+
+def write_hmms_to_pickle_single_variate(optimal_hmms_single_variate):
+    '''
+    :param optimal_hmms_single_variate: tuple containing citizen_id, activity and optimal hmm (by # of clusters) 
     :return: 
     '''
-    means = model.means_
-    covars = model.covars_
-    transmat = model.transmat_
+    for best in optimal_hmms_single_variate:
+        user=best[0]
+        activity=best[1]
+        model=best[2]
+        path='Data/citizen_id_'+str(user)+'/'
+        filename='citizen_id_'+str(user)+'_activity_'+activity+'.pkl'
+        persist_pickle_hmm(model, path, filename)
 
-    dict = {}
-    for ac in zip (activities, means, covars):
-        dict.update({ac[0]:{'means':means[0].tolist(),'covars':covars[0].tolist()}})
-    dict.update({'transmat': transmat})
-    dict={user:dict}
 
-    return dict
+
+def write_hmms_to_pickle_multi_variate(optimal_hmms_multi_variate):
+    '''
+    :param optimal_hmms_single_variate: tuple containing citizen_id, subfactor and optimal hmm (by # of clusters) 
+    :return: 
+    '''
+    for best in optimal_hmms_multi_variate:
+        user=best[0]
+        subfactor=best[1]
+        model=best[2]
+        path='Data/citizen_id_'+str(user)+'/'
+        filename='citizen_id_'+str(user)+'_subfactor_'+subfactor+'.pkl'
+        persist_pickle_hmm(model, path, filename)
+
+
+
+
+
+
 
 '''
 def persist_model_JSON(model, path):
@@ -28,29 +78,18 @@ def persist_model_JSON(model, path):
 '''
 
 
-########## Write mdodel in pickle
-def persist_pickle_hmm(model, path, filename):
-    '''
-    :param model: 
-    :param path: 
-    :param filename: 
-    :return: 
-    '''
-    from sklearn.externals import joblib
-    whole_path=path+filename
-    joblib.dump(model, path+'/'+filename+'.pkl')
-    joblib.load("filename.pkl")
-######## Load model from pickle
-def load_pickle_hmm(path, filename):
-    '''
-    :param path: 
-    :param filename: 
-    :return: model 
-    '''
-    from sklearn.externals import joblib
-    whole_path = path + filename
-    model=joblib.load(path + '/' + filename + '.pkl')
-    return model
+
+
+
+
+
+
+
+
+######### Write models in Dictionary (JSON)
+
+
+
 
 
 
