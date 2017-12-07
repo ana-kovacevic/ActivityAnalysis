@@ -72,6 +72,9 @@ def user_dict_singlevariate_JSON(users_activities_models):
     return users_dict
 
 
+def hmm_to_dict_multi_variate(ges_activities_models):
+
+
 
 
 #def write_multivariate_hmms_JSON()

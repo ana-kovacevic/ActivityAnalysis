@@ -31,7 +31,25 @@ mp.user_dict_singlevariate_JSON(optimal_single_variate)
 
 
 
-mp.create_dict_activities_means_covars(user, ges_activities, model[2])
+model=optimal_multi_variate[66]['quality_of_sleep']
+
+meanovi=model['model'].means_
+aktivnosti=model['activities']
+
+for z in zip(meanovi, aktivnosti):
+    print (z)
+    print(type(z))
+
+for activity in model['activities']:
+
+
+
+
+
+
+
+
+
 
 
 
