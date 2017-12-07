@@ -49,51 +49,8 @@ activity_weights = {'sleep_light_time':0.1, 'sleep_deep_time':0.3, 'sleep_awake_
 ### Create and plot clusters
 model, pivoted_data, activities, hidden_states=create_multi_variate_clusters(data, user, activities, activity_extremization)
 
-import HMM_Optimization as hmm_opt
+import HMM_Optimization.HMM_optimization as hmm_opt
 import data_preparation as dp
-
-def get_optimal_hmms_for_users_multi_variate(data, users):
-    optimal_hmms_single_variate = []
-    subfactor_activities = dp.get_dict_ges_activities()
-    for user in users:
-        for subfactor in subfactor_activities.keys():
-                activities=subfactor_activities[subfactor]
-                prepared_data = dp.prepare_data(data,user,activities)
-                best_value, best_model = hmm_opt.optimize_number_of_clusters(prepared_data.iloc[: ,2:], list(range(2,11)))
-                best=(user, subfactor, best_model)
-                optimal_hmms_single_variate.append(best)
-    return optimal_hmms_single_variate
-
-
-users=[66,67]
-
-get_optimal_hmms_for_users_multi_variate(data,users)
-
-
-
-def create_dict_activities_means_covars(user, activities, model):
-    '''    
-    :param model: HMM model
-    :return:
-     Creates dict of the Hmm model for persistance in JSON
-    '''
-    means = model.means_
-    covars = model.covars_
-    transmat = model.transmat_
-
-    dict = {}
-    for ac in zip (activities, means, covars):
-        dict.update({ac[0]:{'means':means[0].tolist(),'covars':covars[0].tolist()}})
-    dict.update({'transmat': transmat})
-    dict={user:dict}
-
-    return dict
-
-dict=create_dict_activities_means_covars(user, activities, model)
-
-
-
-
 
 
 plot_multivariate_clusters(model, pivoted_data, activities, hidden_states)

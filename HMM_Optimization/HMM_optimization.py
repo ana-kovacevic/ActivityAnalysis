@@ -4,38 +4,32 @@ import data_preparation as dp
 import pandas as pd
 
 
-
-
-
-
-
-def get_optimal_hmms_for_users_single_variate(data, users):
-    optimal_hmms_single_variate = []
+def get_optimal_hmms_for_users_single_variate(data, users, cov_type):
+    optimal_hmms_single_variate = {}
     subfactor_activities = dp.get_dict_ges_activities()
     for user in users:
         for subfactor, activities in subfactor_activities.items():
+            dict_activity={}
             for activity in activities:
                 prepared_data = dp.prepare_data(data,user,[activity])
-                best_value, best_model = optimize_number_of_clusters(prepared_data.iloc[: ,2:], list(range(2,11)))
-                best=(user, activity, best_model)
-                optimal_hmms_single_variate.append(best)
+                best_value, best_model = optimize_number_of_clusters(prepared_data.iloc[: ,2:], list(range(2,11)), cov_type)
+                dict_activity.update({activity: best_model})
+        dict_user={user:dict_activity}
+        optimal_hmms_single_variate.update(dict_user)
     return optimal_hmms_single_variate
 
 
-def get_optimal_hmms_for_users_multi_variate(data, users):
+def get_optimal_hmms_for_users_multi_variate(data, users, cov_type):
     optimal_hmms_single_variate = []
     subfactor_activities = dp.get_dict_ges_activities()
     for user in users:
         for subfactor in subfactor_activities.keys():
                 activities=subfactor_activities[subfactor]
                 prepared_data = dp.prepare_data(data,user,activities)
-                best_value, best_model = optimize_number_of_clusters(prepared_data.iloc[: ,2:], list(range(2,11)))
+                best_value, best_model = optimize_number_of_clusters(prepared_data.iloc[: ,2:], list(range(2,11)), cov_type)
                 best=(user, subfactor, best_model)
                 optimal_hmms_single_variate.append(best)
     return optimal_hmms_single_variate
-
-
-
 
 
 ### Creates single variate HMM models for each activity.
@@ -52,17 +46,19 @@ def create_single_variate_clusters(data, user, activities, activity_extremizatio
     return clusters_activities
 
 
-def optimize_number_of_clusters(data, range_of_clusters):
+def optimize_number_of_clusters(data, range_of_clusters, cov_type):
     '''    
     :param data: prepared data (values of activities by columns) 
     :param range_of_clusters: range of best number expected e.g. 2:10
-    :return: 
+    :return:
+     Optimizes number of clusters for single citizen
+     This is helper method for get_optimal_hmms methods (they work for more citizens)
     '''
     best_value=np.inf # create for maximization and minimization
     best_model=None
     #pivoted_data = prepare_data(data, user, [ac]) old version for data preparation
     for n_states in range_of_clusters:
-        model = GaussianHMM(n_components=n_states, covariance_type="diag", n_iter=1000).fit(data)
+        model = GaussianHMM(n_components=n_states, covariance_type=cov_type, n_iter=1000).fit(data)
         log_likelihood = model.score(data)
         criteria=bic_criteria(data, log_likelihood, model)
         if criteria < best_value:
