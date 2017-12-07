@@ -14,7 +14,7 @@ ges_activities=dp.get_dict_ges_activities() # Add weights as a list to dictionar
 '''
 LEARN OPTIMAL MODELS
 '''
-optimal_multi_variate=hmm_opt.get_optimal_hmms_for_users_multi_variate(data=data, users=users, cov_type='dense')
+optimal_multi_variate=hmm_opt.get_optimal_hmms_for_users_multi_variate(data=data, users=users, cov_type='diag')
 optimal_single_variate=hmm_opt.get_optimal_hmms_for_users_single_variate(data=data, users=users, cov_type='diag')
 
 '''
@@ -27,14 +27,9 @@ mp.write_hmms_to_pickle_multi_variate(optimal_hmms_multi_variate=optimal_multi_v
 '''
 WRITE MODELS TO JSON
 '''
+mp.user_dict_singlevariate_JSON(optimal_single_variate)
 
-user=66
-model=optimal_single_variate[0]
-activities=[ges_activities['physicalactivity'] ges_activities['quality_of_sleep']]
 
-optimal_multi_variate
-
-type(model)
 
 mp.create_dict_activities_means_covars(user, ges_activities, model[2])
 

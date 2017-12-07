@@ -8,8 +8,8 @@ def get_optimal_hmms_for_users_single_variate(data, users, cov_type):
     optimal_hmms_single_variate = {}
     subfactor_activities = dp.get_dict_ges_activities()
     for user in users:
+        dict_activity = {}
         for subfactor, activities in subfactor_activities.items():
-            dict_activity={}
             for activity in activities:
                 prepared_data = dp.prepare_data(data,user,[activity])
                 best_value, best_model = optimize_number_of_clusters(prepared_data.iloc[: ,2:], list(range(2,11)), cov_type)
@@ -20,16 +20,18 @@ def get_optimal_hmms_for_users_single_variate(data, users, cov_type):
 
 
 def get_optimal_hmms_for_users_multi_variate(data, users, cov_type):
-    optimal_hmms_single_variate = []
+    optimal_hmms_multi_variate = {}
     subfactor_activities = dp.get_dict_ges_activities()
     for user in users:
+        dict_subfactor={}
         for subfactor in subfactor_activities.keys():
                 activities=subfactor_activities[subfactor]
                 prepared_data = dp.prepare_data(data,user,activities)
                 best_value, best_model = optimize_number_of_clusters(prepared_data.iloc[: ,2:], list(range(2,11)), cov_type)
-                best=(user, subfactor, best_model)
-                optimal_hmms_single_variate.append(best)
-    return optimal_hmms_single_variate
+                dict_subfactor.update({subfactor:{'model':best_model, 'activities':activities}})
+        dict_user={user:dict_subfactor}
+        optimal_hmms_multi_variate.update(dict_user)
+    return optimal_hmms_multi_variate
 
 
 ### Creates single variate HMM models for each activity.

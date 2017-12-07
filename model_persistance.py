@@ -50,6 +50,32 @@ def write_hmms_to_pickle_single_variate(optimal_hmms_single_variate):
         persist_pickle_hmm(model, path, filename)
 
 
+'''
+WRITE MODELS IN JSON
+'''
+
+def hmm_to_dict_single_variate(activity, model):
+    mean=model.means_[0]
+    var=model.covars_[0]
+    trans_mat=model.transmat_
+    dict={activity:{'mean':mean, 'var':var, 'trans_mat':trans_mat}}
+    return dict
+
+def user_dict_singlevariate_JSON(users_activities_models):
+    users_dict={}
+    for user, activities in users_activities_models.items():
+        activities_dict={}
+        for activity, model in activities.items():
+            model=hmm_to_dict_single_variate(activity, model)
+            activities_dict.update(model)
+        users_dict.update({user:activities_dict})
+    return users_dict
+
+
+
+
+#def write_multivariate_hmms_JSON()
+
 
 def write_hmms_to_pickle_multi_variate(optimal_hmms_multi_variate):
     '''
@@ -92,12 +118,24 @@ def create_dict_node_user_level_single_variate(user, activities_models):
         dict.update(dict)
     dict={user:dict}
 
+
+'''
+def create_dict_for_node_multivariate():
+
+
+def create_dict_users_multi_variate(users_activities_models):
+    dict_users_multivariate={}
+    for user in users_activities_models.keys():
+        for sub_factor in users_activities_models[user]:
+
+
+
 #def create_dict_for_multiple_users_single_variate():
 
 
 
 
-'''
+
 def create_dict_node_user_level(user, ges_activities, model):
         for ges, activity in ges_activities:
             dict = create_dict_for_node_hmm_JSON_single_variate(activity, model)
