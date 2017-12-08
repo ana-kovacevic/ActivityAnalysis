@@ -1,5 +1,15 @@
 ########## Write mdodel in pickle
 
+import pickle
+
+def create_path(user, activity):
+    path = 'Models/Pickle/citizen_id_' + str(user) + '/'
+    file_name='citizen_id_'+str(user)+'_activity_'+activity
+    extension='.pkl'
+    whole_path=path+file_name+extension
+    return whole_path
+
+
 def persist_pickle_hmm(model, path, filename):
     '''
     :param model: 
