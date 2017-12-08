@@ -1,7 +1,10 @@
 import pandas as pd
+
 import data_preparation as dp
 from HMM_Optimization import HMM_optimization as hmm_opt
-import model_persistance as mp
+from Persistence import json_single_variate_hmm as mp
+
+
 
 
 '''
@@ -30,35 +33,12 @@ WRITE MODELS TO JSON
 mp.user_dict_singlevariate_JSON(optimal_single_variate)
 
 
-def create_multivariate_dict_for_JSON(users_ges_activities_models):
-    user_dict={}
-    for user, ges_activities_models in users_ges_activities_models.items():
-
-    dict.update({user:user_dict})
 
 
-def create_dict_user_level_multi_variate(ges_activities_models):
-    dict={}
-    for ges, activities_models in ges_activities_models.items():
-        for activities, model in activities_models:
-            dict.update(create_dict_for_node_hmm_JSON_multi_variate(activities, model))
-        dict.update({ges:dict})
-    return dict
-
-
-
-
-def create_dict_for_node_hmm_JSON_multi_variate(activities, model):
-    means = model['model'].means_
-    activities = model['activities']
-    covars = model['model'].covars_
-    dict={}
-    for z in zip(activities, means, covars):
-        print(z[1])
-        dict.update({z[0]:{'means':list(z[1]), 'covars':list(z[2])}})
-    return dict
-
-
+user=66 # selects one user id
+activities=['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time', 'sleep_wakeup_num']
+activity_extremization = {'sleep_light_time':'max', 'sleep_deep_time':'max', 'sleep_awake_time':'min', 'sleep_wakeup_num':'min', 'sleep_tosleep_time':'min'}
+activity_weights = {'sleep_light_time':0.1, 'sleep_deep_time':0.3, 'sleep_awake_time':0.1, 'sleep_wakeup_num':0.3, 'sleep_tosleep_time':0.2}
 
 
 
