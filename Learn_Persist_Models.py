@@ -18,12 +18,6 @@ LEARN OPTIMAL MODELS
 optimal_multi_variate=hmm_opt.get_optimal_hmms_for_users_multi_variate(data=data, users=users, cov_type='diag')
 optimal_single_variate=hmm_opt.get_optimal_hmms_for_users_single_variate(data=data, users=users, cov_type='diag')
 
-'''
-WRITE MODELS TO PICKLE
-'''
-
-pickle_hmm.write_hmms_to_pickle_single_variate(optimal_hmms_single_variate=optimal_single_variate)
-pickle_hmm.write_hmms_to_pickle_multi_variate(optimal_hmms_multi_variate=optimal_multi_variate)
 
 '''
 WRITE MODELS TO JSON
@@ -39,6 +33,15 @@ with open('Models/HMM/JSON/multivariate_hmms.json', 'w') as outfile:
 
 with open('Models/HMM/JSON/single_variate_hmms.json', 'w') as outfile:
     json.dump(dict_single_variate, outfile)
+
+
+'''
+WRITE MODELS TO PICKLE
+'''
+
+pickle_hmm.write_hmms_to_pickle_single_variate(optimal_hmms_single_variate=optimal_single_variate)
+pickle_hmm.write_hmms_to_pickle_multi_variate(optimal_hmms_multi_variate=optimal_multi_variate)
+
 
 
 
