@@ -30,17 +30,35 @@ WRITE MODELS TO JSON
 mp.user_dict_singlevariate_JSON(optimal_single_variate)
 
 
+def create_multivariate_dict_for_JSON(users_ges_activities_models):
+    user_dict={}
+    for user, ges_activities_models in users_ges_activities_models.items():
 
-model=optimal_multi_variate[66]['quality_of_sleep']
+    dict.update({user:user_dict})
 
-meanovi=model['model'].means_
-aktivnosti=model['activities']
 
-for z in zip(meanovi, aktivnosti):
-    print (z)
-    print(type(z))
+def create_dict_user_level_multi_variate(ges_activities_models):
+    dict={}
+    for ges, activities_models in ges_activities_models.items():
+        for activities, model in activities_models:
+            dict.update(create_dict_for_node_hmm_JSON_multi_variate(activities, model))
+        dict.update({ges:dict})
+    return dict
 
-for activity in model['activities']:
+
+
+
+def create_dict_for_node_hmm_JSON_multi_variate(activities, model):
+    means = model['model'].means_
+    activities = model['activities']
+    covars = model['model'].covars_
+    dict={}
+    for z in zip(activities, means, covars):
+        print(z[1])
+        dict.update({z[0]:{'means':list(z[1]), 'covars':list(z[2])}})
+    return dict
+
+
 
 
 

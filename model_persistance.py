@@ -53,7 +53,7 @@ def write_hmms_to_pickle_single_variate(optimal_hmms_single_variate):
 '''
 WRITE MODELS IN JSON
 '''
-
+############# SINGLE VARIATE
 def hmm_to_dict_single_variate(activity, model):
     mean=model.means_[0]
     var=model.covars_[0]
@@ -70,6 +70,10 @@ def user_dict_singlevariate_JSON(users_activities_models):
             activities_dict.update(model)
         users_dict.update({user:activities_dict})
     return users_dict
+
+
+############ MULTI VARIATE
+
 
 
 def hmm_to_dict_multi_variate(ges_activities_models):
@@ -120,6 +124,7 @@ def create_dict_node_user_level_single_variate(user, activities_models):
         dict=create_dict_for_node_hmm_JSON_single_variate(activity, model)
         dict.update(dict)
     dict={user:dict}
+    return(dict)
 
 
 '''
