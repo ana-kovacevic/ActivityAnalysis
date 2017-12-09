@@ -15,7 +15,7 @@ VIZUALIZATION
 '''
 ### plots clusters for single activity (one plot)
 def plot_single_variate_cluster(activity, model, hidden_states, values, dates):
-    ### Subplot the states multi-variate single user - By States
+    ### Subplot the states multi-variate single user - By States gyf
     fig, axs = plt.subplots(model.n_components, sharex=True, sharey=True)
     colours = cm.rainbow(np.linspace(0, 1, model.n_components))
     #colours = cm.rainbow(np.linspace(0, 1, len(activities)))
