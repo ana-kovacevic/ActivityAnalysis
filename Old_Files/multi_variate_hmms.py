@@ -98,7 +98,7 @@ def plot_single_series(activity, values, dates):
      #   mask = hidden_states == i
     Y = values
     ax=plt.plot_date(dates, Y, ".-", c=colours[0], label =activity )
-    ax.xaxis.set_minor_locator(  MonthLocator())
+    ax.xaxis.set_minor_locator(MonthLocator())
     ax.xaxis.set_minor_locator(DayLocator())
     ax.grid(True)
         #plt.suptitle("User_in_role_id: " + str(results[0]) + "     Activity: "+str(results[1]))

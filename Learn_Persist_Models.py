@@ -9,7 +9,7 @@ from Persistence import pickle_hmm as pickle_hmm
 READ DATA, SELECT USERS AND GES/ACTIVITIES
 '''
 data = pd.read_csv('Data/activities_out.csv') # Reads data with original and normalized values for each user and activity
-users=[66,67]
+users=[66,67,68]
 ges_activities=dp.get_dict_ges_activities() # Add weights as a list to dictionary
 
 '''

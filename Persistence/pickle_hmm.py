@@ -48,7 +48,7 @@ def write_hmms_to_pickle_single_variate(optimal_hmms_single_variate):
     '''
     for user, activity_models in optimal_hmms_single_variate.items():
         for activity, model in activity_models.items():
-            path = create_path_multi_variate(user, activity)
+            path = create_path_single_variate(user, activity)
             persist_pickle_hmm(model, path)
 
 ####### PICKLE
@@ -61,6 +61,6 @@ def write_hmms_to_pickle_multi_variate(optimal_hmms_multi_variate):
     for user, subfactors_models in optimal_hmms_multi_variate.items():
         for subfactor, models in subfactors_models.items():
             model=models['model']
-            path = create_path(user, subfactor)
+            path = create_path_multi_variate(user, subfactor)
             persist_pickle_hmm(model, path)
 
