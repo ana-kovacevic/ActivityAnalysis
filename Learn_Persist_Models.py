@@ -28,7 +28,7 @@ dict_single_variate=json_single.user_dict_singlevariate_JSON(optimal_single_vari
 dict_multi_variate=json_multi.create_dict_users(optimal_multi_variate)
 
 
-with open('Models/HMM/JSON/multivariate_hmms.json', 'w') as outfile:
+with open('Models/HMM/JSON/multi_variate_hmms.json', 'w') as outfile:
     json.dump(dict_multi_variate, outfile)
 
 with open('Models/HMM/JSON/single_variate_hmms.json', 'w') as outfile:
