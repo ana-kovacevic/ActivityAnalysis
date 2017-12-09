@@ -39,7 +39,7 @@ PROGRAM LOGIC
 ###########################################################################
 '''
 
-data = pd.read_csv('activities_out.csv')
+data = pd.read_csv('Data/activities_out.csv')
 
 user=68
 activities=['sleep_awake_time','sleep_deep_time', 'sleep_light_time', 'sleep_tosleep_time', 'sleep_wakeup_num']
@@ -48,6 +48,11 @@ activity_weights = {'sleep_light_time':0.1, 'sleep_deep_time':0.3, 'sleep_awake_
 
 ### Create and plot clusters
 model, pivoted_data, activities, hidden_states=create_multi_variate_clusters(data, user, activities, activity_extremization)
+
+import HMM_Optimization.HMM_optimization as hmm_opt
+import data_preparation as dp
+
+
 plot_multivariate_clusters(model, pivoted_data, activities, hidden_states)
 
 

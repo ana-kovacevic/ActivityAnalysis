@@ -9,7 +9,7 @@ def get_users_activities(data, user):
     :param user: user elderly
     :return: all activities
     
-    Gets all activities for specified user and returns activity names and counts
+    Gets all activities for specified user and returns activity names and counts from dataset
     Exploratory method for selection of users/activities for modelling
     '''
     user_data=data[data['user_in_role_id']==user]
@@ -25,7 +25,7 @@ def select_pivot_users_activities(data, user, activities):
     '''
     user_data=data[data['user_in_role_id']==user]
     user_data=user_data[user_data['detection_variable_name'].isin(activities)]
-    pivot_data = user_data.pivot_table(index=['user_in_role_id', 'interval_end'], columns='detection_variable_name',values='Normalised')
+    pivot_data = user_data.pivot_table(index=['user_in_role_id', 'interval_end'], columns=['detection_variable_name'], values=['Normalised'])
     return pivot_data
 
 
@@ -43,7 +43,15 @@ def prepare_data(data, user, activities):
     !!!If used for Single-Variate clustering list have to be passed (for one activity)
     '''
     pivoted_data = select_pivot_users_activities(data, user, activities)
+
+    pivoted_data.columns = pivoted_data.columns.droplevel(0)  # remove amount
+    pivoted_data.columns.name = None
+
+    ##### Rename variable to detection_variable_name
+
     pivoted_data = pivoted_data.reset_index()
+
+
     pivoted_data['interval_end'] = pd.to_datetime(pivoted_data['interval_end'])
     pivoted_data = pivoted_data.sort_values(['user_in_role_id', 'interval_end'])
     return pivoted_data
