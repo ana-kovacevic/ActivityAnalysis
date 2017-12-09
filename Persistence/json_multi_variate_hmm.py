@@ -7,7 +7,6 @@ MULTI VARIATE
 #import json
 #from Persistence import paths
 
-
 def create_dict_users(users_ges_activities_models):
     dict = {}
     for user, ges_activities_models in users_ges_activities_models.items():

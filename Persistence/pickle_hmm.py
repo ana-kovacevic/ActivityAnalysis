@@ -41,6 +41,14 @@ def load_pickle_hmm_single_variate(user, activity):
     return model
 
 
+def load_pickle_hmm_multi_variate(user, activity):
+    path=create_path_multi_variate(user, activity)
+    file = open(path, "rb")
+    model=pickle.load(file)
+    return model
+
+
+
 def write_hmms_to_pickle_single_variate(optimal_hmms_single_variate):
     '''
     :param:  
