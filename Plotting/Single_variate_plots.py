@@ -51,7 +51,7 @@ def create_single_variate_plot(data, user, activity):
         # plt.suptitle("User_in_role_id: " + str(results[0]) + "     Activity: "+str(results[1]))
         # plt.savefig(path_store + 'user_' + str(results[0])+ '_activity_'+str(results[1])+'.png', bbox_inches='tight')
     fig.subplots_adjust(top=0.89, left=0.1, right=0.9, bottom=0.12, hspace = 0.25)
-    axs.flatten()[-1].legend(loc='lower center', bbox_to_anchor=(0.5, -0.5), ncol=2)
+    #axs.flatten()[-1].legend(loc='lower center', bbox_to_anchor=(0.5, -0.5), ncol=2)
     plt.suptitle("User_in_role_id: " + str(user) + "     Activity: "+ activity)
     plt.rcParams["figure.figsize"]=[10.0, 10.0]
     plt.savefig( 'Plots/single_variate/''citizen_id_' + str(user)+ '_activity_'+ activity +'.png')
