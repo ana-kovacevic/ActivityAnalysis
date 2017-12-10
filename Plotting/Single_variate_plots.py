@@ -22,7 +22,7 @@ def get_users_activities(users_activities_models):
         dict.update({int(user):activity_list})
     return dict
 
-create_single_variate_plot(clustered_data, 66, 'sleep_deep_time')
+
 
 #type(clustered_data['interval_end'][0])
 
@@ -55,7 +55,7 @@ def create_single_variate_plot(data, user, activity):
     plt.suptitle("User_in_role_id: " + str(user) + "     Activity: "+ activity)
     plt.rcParams["figure.figsize"]=[10.0, 10.0]
     plt.savefig( 'Plots/single_variate/''citizen_id_' + str(user)+ '_activity_'+ activity +'.png')
-    #plt.show()
+    
 
 
 #### Read clustered data
@@ -81,5 +81,5 @@ user66 = clusterd_data.loc[(clusterd_data['user_in_role_id'] == 66) & clusterd_d
 num_clusters = len(user66.cluster.unique())
 hidden_states = user66['cluster']
 dates = user66['interval_end']
-
+create_single_variate_plot(clustered_data, 66, 'sleep_deep_time')
 '''
