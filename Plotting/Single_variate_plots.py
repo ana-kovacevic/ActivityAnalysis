@@ -4,27 +4,8 @@ import numpy as np
 import datetime as dt
 import pandas as pd
 import json
+import Models_Score as ms
 
-
-
-######### This method is defined in Models_Score and shoud be removed
-######### Instead of re-defining, it should be imported and called from here
-def get_users_activities(users_activities_models):
-    '''
-    :param users_activities_models: 
-    :return: 
-    '''
-    dict={}
-    for user, activities_models in users_activities_models.items():
-        activity_list=[]
-        for activity in activities_models.keys():
-            activity_list.append(activity)
-        dict.update({int(user):activity_list})
-    return dict
-
-
-
-#type(clustered_data['interval_end'][0])
 
 ##### Create plot
 
@@ -55,7 +36,7 @@ def create_single_variate_plot(data, user, activity):
     plt.suptitle("User_in_role_id: " + str(user) + "     Activity: "+ activity)
     plt.rcParams["figure.figsize"]=[10.0, 10.0]
     plt.savefig( 'Plots/single_variate/''citizen_id_' + str(user)+ '_activity_'+ activity +'.png')
-    
+
 
 
 #### Read clustered data
@@ -66,9 +47,7 @@ clustered_data = pd.read_csv('Data/clustered_data/single_variate_clusters.csv')
 #users = clusterd_data.user_in_role_id.unique()
 json_users_activities_models=open('Models/HMM/JSON/single_variate_hmms.json').read()
 users_activities_models=json.loads(json_users_activities_models)
-users_activities = get_users_activities(users_activities_models)
-
-users_activities
+users_activities = ms.get_users_activities(users_activities_models)
 
 
 for user, activities in users_activities.items():
@@ -76,10 +55,37 @@ for user, activities in users_activities.items():
         create_single_variate_plot(clustered_data, user, activity)
 
 
+
+########################### Plot single series with colored clusters
+
 '''
-user66 = clusterd_data.loc[(clusterd_data['user_in_role_id'] == 66) & clusterd_data['detection_variable_name'].isin(['physicalactivity_calories'])]
+user66 = clustered_data.loc[(clustered_data['user_in_role_id'] == 66) & clustered_data['detection_variable_name'].isin(['physicalactivity_calories'])]
 num_clusters = len(user66.cluster.unique())
 hidden_states = user66['cluster']
 dates = user66['interval_end']
-create_single_variate_plot(clustered_data, 66, 'sleep_deep_time')
+values = user66['measure_value']
+
+
+
+a = hidden_states
+x = dates
+y = values
+colors=cm.rainbow(np.linspace(0,1,num_clusters))
+
+for a, x1, x2, y1, y2 in zip(a[1:], x[:-1], x[1:], y[:-1], y[1:]):
+    for h in hidden_states:
+        
+        if a == 0:
+            plt.plot([x1, x2], [y1, y2], 'r')
+        elif a ==1 :
+            plt.plot([x1, x2], [y1, y2], 'g')
+        else:
+            plt.plot([x1, x2], [y1, y2], 'b')
+
+plt.show()
+
 '''
+
+
+
+

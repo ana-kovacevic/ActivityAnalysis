@@ -24,7 +24,7 @@ def get_users_activities(users_activities_models):
         dict.update({int(user):activity_list})
     return dict
 
-users_activities = get_users_activities(users_activities_models)
+
 
 def predict_single_variate(users_activities):
     '''
@@ -51,8 +51,11 @@ data=pd.read_csv('Data/activities_out.csv')
 
 json_users_activities_models=open('Models/HMM/JSON/single_variate_hmms.json').read()
 users_activities_models=json.loads(json_users_activities_models)
+users_activities = get_users_activities(users_activities_models)
 predictions=predict_single_variate(users_activities)
 predictions=predictions.rename(columns={'variable': 'detection_variable_name'})
+data['interval_end'] = pd.to_datetime(data['interval_end'])
+
 clustered_data=pd.merge(data, predictions, how='inner', on= ['user_in_role_id', 'detection_variable_name' ,'interval_end'])
 clustered_data.to_csv('Data/clustered_data/single_variate_clusters.csv')
 
