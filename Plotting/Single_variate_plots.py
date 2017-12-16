@@ -38,10 +38,34 @@ def create_single_variate_plot(data, user, activity):
     plt.savefig( 'Plots/single_variate/''citizen_id_' + str(user)+ '_activity_'+ activity +'.png')
 
 
+########################### Plot single series with colored clusters
+
+def create_oneSeries_single_variate_plot(data, user, activity):
+
+    plt.clf()
+    data = data.loc[(data['user_in_role_id'] == user) & (data['detection_variable_name'].isin([activity]))]
+    num_clusters = len(data.cluster.unique())
+    dates = data['interval_end']
+    hidden_states = data['cluster']
+    a = hidden_states
+    x = dates
+    Y = data['measure_value']
+
+    colours = cm.rainbow(np.linspace(0, 1, num_clusters))
+
+    for a, x1, x2, y1, y2 in zip(a[1:], x[:-1], x[1:], Y[:-1], Y[1:]):
+        plt.plot_date([x1, x2], [y1, y2], ".-", c=colours[a])
+
+    plt.suptitle("User_in_role_id: " + str(user) + "     Activity: " + activity)
+    plt.rcParams["figure.figsize"] = [30.0, 8.0]
+    plt.savefig( 'Plots/transitions/''Transition_citizen_id_' + str(user)+ '_activity_'+ activity +'.png')
+
+
+    plt.show()
+
 
 #### Read clustered data
 clustered_data = pd.read_csv('Data/clustered_data/single_variate_clusters.csv')
-#clusterd_data.head()
 
 #### Get unique users and theirs activities
 #users = clusterd_data.user_in_role_id.unique()
@@ -49,43 +73,12 @@ json_users_activities_models=open('Models/HMM/JSON/single_variate_hmms.json').re
 users_activities_models=json.loads(json_users_activities_models)
 users_activities = ms.get_users_activities(users_activities_models)
 
-
+#### generate single varite plots where each state is on another subplot
 for user, activities in users_activities.items():
     for activity in activities:
         create_single_variate_plot(clustered_data, user, activity)
 
-
-
-########################### Plot single series with colored clusters
-
-'''
-user66 = clustered_data.loc[(clustered_data['user_in_role_id'] == 66) & clustered_data['detection_variable_name'].isin(['physicalactivity_calories'])]
-num_clusters = len(user66.cluster.unique())
-hidden_states = user66['cluster']
-dates = user66['interval_end']
-values = user66['measure_value']
-
-
-
-a = hidden_states
-x = dates
-y = values
-colors=cm.rainbow(np.linspace(0,1,num_clusters))
-
-for a, x1, x2, y1, y2 in zip(a[1:], x[:-1], x[1:], y[:-1], y[1:]):
-    for h in hidden_states:
-        
-        if a == 0:
-            plt.plot([x1, x2], [y1, y2], 'r')
-        elif a ==1 :
-            plt.plot([x1, x2], [y1, y2], 'g')
-        else:
-            plt.plot([x1, x2], [y1, y2], 'b')
-
-plt.show()
-
-'''
-
-
-
-
+### generate single variate plots where Time Series is colored by states
+for user, activities in users_activities.items():
+    for activity in activities:
+        create_oneSeries_single_variate_plot(clustered_data, user, activity)
