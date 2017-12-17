@@ -55,17 +55,22 @@ def create_oneSeries_single_variate_plot(data, user, activity):
 
     for a, x1, x2, y1, y2 in zip(a[1:], x[:-1], x[1:], Y[:-1], Y[1:]):
         plt.plot_date([x1, x2], [y1, y2], ".-", c=colours[a])
+        plt.grid(True)
 
+    plt.subplots_adjust(top=0.89, left=0.1, right=0.9, bottom=0.12)
     plt.suptitle("User_in_role_id: " + str(user) + "     Activity: " + activity)
-    plt.rcParams["figure.figsize"] = [30.0, 8.0]
+    plt.rcParams["figure.figsize"] = [20.0, 10.0]
     plt.savefig( 'Plots/transitions/''Transition_citizen_id_' + str(user)+ '_activity_'+ activity +'.png')
 
 
     plt.show()
 
 
+
+
 #### Read clustered data
 clustered_data = pd.read_csv('Data/clustered_data/single_variate_clusters.csv')
+
 
 #### Get unique users and theirs activities
 #users = clusterd_data.user_in_role_id.unique()
@@ -82,3 +87,12 @@ for user, activities in users_activities.items():
 for user, activities in users_activities.items():
     for activity in activities:
         create_oneSeries_single_variate_plot(clustered_data, user, activity)
+
+'''
+################################################
+data = clustered_data.loc[(clustered_data['user_in_role_id'] == 66) & (clustered_data['detection_variable_name'].isin(['physicalactivity_calories']))]
+num_clusters = len(data.cluster.unique())
+dates = data['interval_end']
+hidden_states = data['cluster']
+create_oneSeries_single_variate_plot(data, 66, 'physicalactivity_calories')
+'''
