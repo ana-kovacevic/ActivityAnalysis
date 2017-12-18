@@ -38,8 +38,8 @@ def log_activity_results(data, users, range_of_clusters, cov_type, single_multi)
                 for n_states in range_of_clusters:
                     model = GaussianHMM(n_components=n_states, covariance_type=cov_type, n_iter=1000).fit(prepared_data.iloc[: ,2:])
                     log_likelihood = model.score(prepared_data.iloc[: ,2:])
-                    criteria_bic = bic_criteria(data, log_likelihood, model)
-                    criteria_aic = aic_criteria(data, log_likelihood, model)
+                    criteria_bic = bic_criteria(prepared_data.iloc[: ,2:], log_likelihood, model)
+                    criteria_aic = aic_criteria(prepared_data.iloc[: ,2:], log_likelihood, model)
                     aic_bic_dict = {'user': user, 'activity': activity, 'n_states': n_states, 'BIC': criteria_bic,
                                     'AIC': criteria_aic, 'Log_Likelihood':log_likelihood}
                     log_results.append(aic_bic_dict)
