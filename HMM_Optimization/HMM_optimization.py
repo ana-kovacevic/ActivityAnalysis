@@ -62,7 +62,7 @@ def optimize_number_of_clusters(data, range_of_clusters, cov_type):
     for n_states in range_of_clusters:
         model = GaussianHMM(n_components=n_states, covariance_type=cov_type, n_iter=1000).fit(data)
         log_likelihood = model.score(data)
-        criteria=bic_criteria(data, log_likelihood, model)
+        criteria=aic_criteria(data, log_likelihood, model)
         if criteria < best_value:
             best_value, best_model = criteria, model
     return best_value, best_model

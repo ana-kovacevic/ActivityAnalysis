@@ -46,10 +46,12 @@ def predict_single_variate(users_activities):
             df_predictions=df_predictions.append(a)
     return df_predictions
 
+'''
+# uncomment this when working
 
 data=pd.read_csv('Data/activities_out.csv')
 
-json_users_activities_models=open('Models/HMM/JSON/single_variate_hmms.json').read()
+json_users_activities_models=open('Models/HMM/AIC/JSON/single_variate_hmms_aic.json').read()
 users_activities_models=json.loads(json_users_activities_models)
 users_activities = get_users_activities(users_activities_models)
 predictions=predict_single_variate(users_activities)
@@ -57,7 +59,9 @@ predictions=predictions.rename(columns={'variable': 'detection_variable_name'})
 data['interval_end'] = pd.to_datetime(data['interval_end'])
 
 clustered_data=pd.merge(data, predictions, how='inner', on= ['user_in_role_id', 'detection_variable_name' ,'interval_end'])
-clustered_data.to_csv('Data/clustered_data/single_variate_clusters.csv')
+clustered_data.to_csv('Data/clustered_data/single_variate_clusters_aic.csv')
+
+'''
 
 '''
 ##########################
@@ -103,12 +107,14 @@ def predict_multi_variate(data, users_ges_activities):
             #a=pd.melt(prep_data, id_vars=['user_in_role_id', 'interval_end','cluster', 'max_probability'], value_vars=activity)
             prep_data.to_csv('Data/clustered_data/multi_variate_clusters/citizen_id_'+str(user)+'_'+ges+'.csv')
     return 0
+'''
+#uncomment this when working
 
 json_users_activities_models=open('Models/HMM/JSON/multi_variate_hmms.json').read()
 users_activities_models=json.loads(json_users_activities_models)
 users_ges_activities=get_users_ges_activities(users_activities_models)
 a=predict_multi_variate(data, users_ges_activities)
-
+'''
 
 
 

@@ -3,14 +3,14 @@
 import pickle
 
 def create_path_single_variate(user, activity):
-    path = 'Models/HMM/Pickle/citizen_id_' + str(user) + '/'
+    path = 'Models/HMM/AIC/Pickle/citizen_id_' + str(user) + '/'
     file_name='citizen_id_'+str(user)+'_activity_'+activity
     extension='.pkl'
     whole_path=path+file_name+extension
     return whole_path
 
 def create_path_multi_variate(user, activity):
-    path = 'Models/HMM/Pickle/citizen_id_' + str(user) + '/'
+    path = 'Models/HMM/AIC/Pickle/citizen_id_' + str(user) + '/'
     file_name='citizen_id_'+str(user)+'_ges_'+activity
     extension='.pkl'
     whole_path=path+file_name+extension

@@ -43,6 +43,7 @@ def create_single_variate_plot(data, user, activity):
 def create_oneSeries_single_variate_plot(data, user, activity):
 
     plt.clf()
+    data['interval_end'] = pd.to_datetime(data['interval_end'])
     data = data.loc[(data['user_in_role_id'] == user) & (data['detection_variable_name'].isin([activity]))]
     num_clusters = len(data.cluster.unique())
     dates = data['interval_end']
@@ -62,19 +63,19 @@ def create_oneSeries_single_variate_plot(data, user, activity):
     plt.rcParams["figure.figsize"] = [20.0, 10.0]
     plt.savefig('Plots/transitions/''Transition_citizen_id_' + str(user)+ '_activity_'+ activity +'.png')
 
-
-    plt.show()
+    plt.close()
+    #plt.show()
 
 
 
 
 #### Read clustered data
-clustered_data = pd.read_csv('Data/clustered_data/single_variate_clusters.csv')
+clustered_data = pd.read_csv('Data/clustered_data/single_variate_clusters_aic.csv')
 
 
 #### Get unique users and theirs activities
 #users = clusterd_data.user_in_role_id.unique()
-json_users_activities_models=open('Models/HMM/JSON/single_variate_hmms.json').read()
+json_users_activities_models=open('Models/HMM/AIC/JSON/single_variate_hmms_aic.json').read()
 users_activities_models=json.loads(json_users_activities_models)
 users_activities = ms.get_users_activities(users_activities_models)
 
