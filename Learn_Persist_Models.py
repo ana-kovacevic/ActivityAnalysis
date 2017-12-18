@@ -12,6 +12,16 @@ data = pd.read_csv('Data/activities_out.csv') # Reads data with original and nor
 users=[66,67,68]
 ges_activities=dp.get_dict_ges_activities() # Add weights as a list to dictionary
 
+
+'''
+LOG EXPERIMENTAL RESULTS
+'''
+
+hmm_opt.log_activity_results(data,users, list(range(2, 11)), 'diag', 'single')
+
+data.columns
+
+
 '''
 LEARN OPTIMAL MODELS
 '''
@@ -52,10 +62,6 @@ activity_extremization = {'sleep_light_time':'max', 'sleep_deep_time':'max', 'sl
 activity_weights = {'sleep_light_time':0.1, 'sleep_deep_time':0.3, 'sleep_awake_time':0.1, 'sleep_wakeup_num':0.3, 'sleep_tosleep_time':0.2}
 
 '''
-
-
-
-
 
 
 
