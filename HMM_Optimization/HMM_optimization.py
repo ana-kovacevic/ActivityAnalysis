@@ -70,6 +70,27 @@ def optimize_number_of_clusters(data, range_of_clusters, cov_type):
 ### TODO add method for research purposes
 #def log_hmm_optimization():
 
+def optimize_number_of_clusters_and_log_results(data, range_of_clusters, cov_type):
+    '''
+    :param data: prepared data (values of activities by columns)
+    :param range_of_clusters: range of best number expected e.g. 2:10
+    :return:
+     Optimizes number of clusters for single citizen
+     This is helper method for get_optimal_hmms methods (they work for more citizens)
+    '''
+    dict_results={}
+    best_value=np.inf # create for maximization and minimization
+    best_model=None
+    #pivoted_data = prepare_data(data, user, [ac]) old version for data preparation
+    for n_states in range_of_clusters:
+        model = GaussianHMM(n_components=n_states, covariance_type=cov_type, n_iter=1000).fit(data)
+        log_likelihood = model.score(data)
+        criteria=bic_criteria(data, log_likelihood, model)
+
+        if criteria < best_value:
+            best_value, best_model = criteria, model
+    return best_value, best_model
+
 
 def bic_criteria(data, log_likelihood, model):
     '''
