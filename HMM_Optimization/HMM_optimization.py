@@ -119,7 +119,7 @@ def log_activity_results(data, users, range_of_clusters, cov_type, single_multi)
                 #log = optimize_number_of_clusters(prepared_data.iloc[:, 2:], list(range(2, 11)), cov_type)
                 # pivoted_data = prepare_data(data, user, [ac]) old version for data preparation
                 for n_states in range_of_clusters:
-                    model = GaussianHMM(n_components=n_states, covariance_type=cov_type, n_iter=1000).fit(prepared_data['Normalised'])
+                    model = GaussianHMM(n_components=n_states, covariance_type=cov_type, n_iter=1000).fit(prepared_data.iloc[: ,1:])
                     log_likelihood = model.score(data)
                     criteria_bic = bic_criteria(data, log_likelihood, model)
                     criteria_aic = aic_criteria(data, log_likelihood, model)
